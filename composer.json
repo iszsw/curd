@@ -1,0 +1,38 @@
+{
+  "name": "iszsw/porter",
+  "description": "Mysql数据表生成页面",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "zsw",
+      "email": "zswemail@qq.com"
+    }
+  ],
+  "homepage": "https://zsw.ink/",
+  "keywords": [
+    "thinkphp",
+    "iszsw",
+    "porter"
+  ],
+  "require": {
+    "iszsw/surface": "^1.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "iszsw\\porter\\": "src"
+    },
+    "files": [
+      "src/helper.php"
+    ]
+  },
+  "extra": {
+    "think": {
+      "services": [
+        "iszsw\\porter\\Service"
+      ],
+      "config": {
+        "trace": "src/config.php"
+      }
+    }
+  }
+}
