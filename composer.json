@@ -31,7 +31,7 @@
         "iszsw\\porter\\Service"
       ],
       "config": {
-        "trace": "src/config.php"
+        "porter": "src/config.php"
       }
     }
   }
