@@ -75,7 +75,10 @@ return [
 ];
 ```
 
-![数据表管理](https://s.zsw.ink/porter/table.png)
-![字段管理](https://s.zsw.ink/porter/fields.png)
-![生成的管理页面](https://s.zsw.ink/porter/page.png)
+![https://s.zsw.ink/porter/table.png](https://s.zsw.ink/porter/table.png)
 
+![https://s.zsw.ink/porter/fields.png](https://s.zsw.ink/porter/fields.png)
+
+![https://s.zsw.ink/porter/page.png](https://s.zsw.ink/porter/page.png)
+
+图片被吃了 直接打开链接吧
