@@ -21,7 +21,7 @@
 
 > 1、安装 
 
-```composer require iszsw/porter:dev-master```
+```composer require iszsw/porter```
 
 > 2、访问 http://site.com/table 可以查看相应功能
 
