@@ -13,9 +13,9 @@
 
 > 主页  [https://zsw.ink](https://zsw.ink) 查看介绍和演示
 
-> github  [https://github.com/iszsw/porter](https://github.com/iszsw/mock)
+> github  [https://github.com/iszsw/porter](https://github.com/iszsw/porter)
 
-> gitee  [https://gitee.com/iszsw/porter](https://gitee.com/iszsw/mock)
+> gitee  [https://gitee.com/iszsw/porter](https://gitee.com/iszsw/porter)
 
 ## 使用
 

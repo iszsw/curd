@@ -26,7 +26,10 @@ class File extends Manage
     {
         $this->config = array_merge($this->config, $config);
 
-        if (!is_dir($this->config['save_path']) || !is_writable($this->config['save_path'])) {
+        if(
+            !(is_dir($this->config['save_path']) || mkdir($this->config['save_path'], 0777, true))
+            || !is_writable($this->config['save_path'])
+        ) {
             throw new \Exception('数据表配置文件路径 '.$this->config['save_path'].' 不存在或者不可写');
         }
     }
