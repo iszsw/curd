@@ -14,17 +14,17 @@
         "iszsw",
         "curd"
     ],
+    "support": {
+        "issues": "https://github.com/iszsw/curd/issues",
+        "source": "https://github.com/iszsw/curd"
+    },
     "require": {
+        "php": ">=7.1.3",
         "iszsw/surface": "~1.2.0"
     },
     "autoload": {
         "psr-4": {
             "iszsw\\curd\\": "src"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "iszsw\\curd\\test\\": "test"
         }
     },
     "extra": {
@@ -33,7 +33,7 @@
                 "iszsw\\curd\\Service"
             ],
             "config": {
-                "porter": "src/config.php"
+                "curd": "src/config.php"
             }
         }
     }
