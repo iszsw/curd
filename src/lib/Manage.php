@@ -251,10 +251,10 @@ abstract class Manage
      */
     protected static function filter(string $str): string
     {
-        if ( ! get_magic_quotes_gpc())
-        {
-            $str = addslashes($str);
-        }
+        $str = addslashes($str);
+
+        $str = str_replace("%", "\%", $str);
+
         $str = nl2br($str);
 
         return htmlspecialchars($str);

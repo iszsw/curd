@@ -40,9 +40,10 @@ $ composer require iszsw/curd
 ```
 
 ## 使用
-> 1、配置 config/curd.php 文件中 route_prefix（访问前缀）
 
-> 2、访问 http://domain.com/前缀
+> 1、连接数据库
+
+> 2、访问 http://domain.com/curd  （url前缀配置查看config/curd.php配置文件route_prefix）
 
 
 ## 说明

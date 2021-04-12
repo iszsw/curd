@@ -61,7 +61,7 @@ class Form implements FormInterface
                 ->props(['allow-create'=> true, 'filterable' => true, 'multiple' => true, 'default-first-option' => true])
                 ->options(Helper::formatOptions(TableModel::$formatTypes))
                 ->marker(
-                    "表格中显示该字段时会触发 多选会按顺序依次执行<br>1.PHP方法,自定义方法,类静态方法（datetime | user_func | class,method）参数（当前值，当前列） <br>2.内容替换冒号开头"
+                    "表格中显示该字段时会触发 多选会按顺序依次执行<br>1.PHP方法,自定义方法,类静态方法（datetime | user_func | class::method）参数（当前值，当前列） <br>2.内容替换冒号开头"
                     .htmlspecialchars("(:<b>{data}</b>)")
                 ),
             (new Arrays('table_extend', TableModel::$labels['table_extend'], Helper::formatOptions($data['table_extend'] ?? [], TableModel::VALUE, TableModel::KEY)))->options(
@@ -79,7 +79,7 @@ class Form implements FormInterface
                 ->props(['allow-create'=> true, 'filterable' => true, 'multiple' => true, 'default-first-option' => true])
                 ->options(TableModel::$formatTypes)
                 ->marker(
-                    "表单中显示该字段时会触发 多选会按顺序依次执行<br>1.PHP方法,自定义方法,类静态方法（datetime | user_func | class,method）参数（当前值，当前列） <br>2.内容替换冒号开头"
+                    "表单中显示该字段时会触发 多选会按顺序依次执行<br>1.PHP方法,自定义方法,类静态方法（datetime | user_func | class::method）参数（当前值，当前列） <br>2.内容替换冒号开头"
                     .htmlspecialchars("(:<b>{data}</b>)")
                 ),
             (new Arrays('form_extend', TableModel::$labels['form_extend'], Helper::formatOptions($data['form_extend'] ?? [], TableModel::VALUE, TableModel::KEY)))->options(
@@ -95,7 +95,7 @@ class Form implements FormInterface
                 ->props(['allow-create'=> true, 'filterable' => true, 'multiple' => true, 'default-first-option' => true])
                 ->options(TableModel::$formatTypes)
                 ->marker(
-                    "保存该字段时会触发 多选会按顺序依次执行<br>1.PHP方法,自定义方法,类静态方法（datetime | user_func | class,method）参数（当前值，当前列） <br>2.内容替换冒号开头"
+                    "保存该字段时会触发 多选会按顺序依次执行<br>1.PHP方法,自定义方法,类静态方法（datetime | user_func | class::method）参数（当前值，当前列） <br>2.内容替换冒号开头"
                     .htmlspecialchars("(:<b>{data}</b>)")
                 ),
         ];

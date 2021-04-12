@@ -13,9 +13,9 @@ return [
     'surface' => [
         'table' => [
             'globals' => [ // table公共配置
-                           'props' => [
-                               'emptyText' => "没有更多",
-                           ],
+                'props' => [
+                    'emptyText' => "没有更多",
+                ],
             ],
         ],
         'form'  => [
