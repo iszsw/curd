@@ -1,10 +1,15 @@
 <?php
 /**
  * Author: zsw zswemail@qq.com
- * Date: 2019/11/25 10:11
+ *
  */
 
-namespace iszsw\porter\lib;
+namespace iszsw\curd\lib;
+
+use iszsw\curd\Helper;
+use surface\Component;
+use surface\Factory;
+use surface\form\Form;
 
 class ResolveField extends Resolve
 {
@@ -13,7 +18,13 @@ class ResolveField extends Resolve
      * 列项
      * @var array
      */
-    private $column;
+    private $columns;
+
+    /**
+     * 搜索列
+     * @var
+     */
+    private $searchColumns;
 
     /**
      * 解析数据
@@ -27,54 +38,143 @@ class ResolveField extends Resolve
      */
     private $original = [];
 
+    /**
+     * @var Form
+     */
+    private $surfaceForm;
 
     /**
-     * 表格数据解析
-     * Author: zsw zswemail@qq.com
+     * 表单参数配置解析
+     *
+     * @param      $field
+     * @param null $default 默认值
+     *
+     * @return array
      */
-    protected function resolve()
+    protected function resolveFormColumn(array $field, $default = null): array
     {
-         $this->resolveColumn();
+        return $this->resolveColumnByProps($field['form_extend'], $field, $default, $field['form_type']);
     }
 
-
-    protected function resolveColumn()
+    protected function resolveColumnByProps(array $props, array $field, $default, $type = 'input')
     {
-        foreach ($this->table['fields'] as $k => $config) {
-            $column = $this->resolveFormColumn($config, $this->data[$config['field']] ?? null);
-
-            if ($config["form_format"] ?? 0) {
-                $column['value'] = $this->initFormat($config["form_format"], $column['value']);
-            }
-
-            $column && $this->column[] = $column;
+        if ( ! $type )
+        {
+            return [];
         }
+
+        $column = [
+            'type'  => $type,
+            'field' => $field['field'],
+            'title' => $field['title'],
+            'value' => is_null($default) ? $field['default'] ?? '' : $default,
+            'props' => $props,
+            'options' => null,
+        ];
+
+        switch ($type)
+        {
+            case 'cascader':
+            case 'select':
+            case 'radio':
+            case 'checkbox':
+            case 'switcher':
+            case 'take':
+                $in = $type === 'take' ? (array)$column['value'] : [];
+                if ($field['relation'])
+                { // 扩展字段
+                    $column['options'] = Helper::formatOptions($this->options($field['option_remote_relation'], 'option_remote_relation', $in));
+                } else
+                {
+                    $column['options'] = Helper::formatOptions($this->options($field[$field['option_type']] ?? '', $field['option_type'], $in));
+                }
+                break;
+            default:
+        }
+
+        return $column;
+    }
+
+    protected function resolveColumns($search = false):void
+    {
+        if (!$this->surfaceForm) {
+            $this->surfaceForm = Factory::Form();
+        }
+        $columns = [];
+        foreach ($this->table['fields'] as $k => $config) {
+            if ($search && $config['search_type'] === "0") continue;
+            $column = $this->resolveFormColumn($config, $this->data[$config['field']] ?? null);
+            if (count($column) > 0) {
+                if (count($config["form_format"]) > 0) {
+                    $column['value'] = $this->initFormat($config["form_format"], $column['value']);
+                }
+                $columns[] = $this->generateForm($column['type'], $column['field'], $column['title'], $column['value'], $column['props'], $column['options']);
+            }
+        }
+        if ($search) {
+            $this->searchColumns = $columns;
+        }else {
+            $this->columns = $columns;
+        }
+    }
+
+    private function generateForm($type, $prop, $label, $value, $props, ?array $options = null): Component
+    {
+        /**@var $component Component */
+        $value = $value ?? '';
+        if ($type === 'hidden') {
+            $component = $this->surfaceForm->$type($prop, $value);
+        }else{
+            $component = $this->surfaceForm->$type($prop, $label, $value);
+        }
+
+        count($props) > 0 && $component->props($props);
+        if (is_array($options)) {
+            $component->options($options);
+        }
+
+        return $component;
     }
 
     public function setData($pk)
     {
-        $this->original = $this->data = Model::instance($this->table['table'])->findOrFail($pk);
+        $this->original = $data = Model::instance($this->table['table'])->findOrFail($pk);
         foreach ($this->table['fields'] as $v) {
-            $this->data[$v['field']] = $this->resolveFormDefault($v, $this->data[$v['field']] ?? '', $this->original);
+            $this->data[$v['field']] = $this->resolveFormDefault($v, $data[$v['field']] ?? '', $this->original);
         }
     }
 
     /**
-     * Form无需做默认配置
-     * @return array
+     * @param bool $search 搜索页面
+     *
+     * @return array[]
      */
-    public function getDefault()
+    public function getOptions($search = false)
     {
-        return [];
+        $options = [];
+        if (!$search) {
+            $options['async'] = [
+                'url' => Helper::builder_table_url('page/update', ['_table' => $this->table['table']]),
+            ];
+        }
+
+        return $options;
     }
 
-    public function getColumn()
+    public function getColumns()
     {
-        if (!$this->column) {
-            $this->column = [];
-            $this->resolveColumn();
+        if (!$this->columns) {
+            $this->resolveColumns(false);
         }
-        return $this->column;
+        return $this->columns;
+    }
+
+    public function getSearchColumns()
+    {
+        if (!$this->searchColumns) {
+            $this->resolveColumns(true);
+        }
+        return $this->searchColumns;
     }
 
 }

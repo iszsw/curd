@@ -1,83 +1,184 @@
 <?php
 /**
  * Author: zsw zswemail@qq.com
- * Date: 2019/11/25 10:11
+ *
  */
 
-namespace iszsw\porter\lib;
+namespace iszsw\curd\lib;
 
+use iszsw\curd\Helper;
+use surface\Component;
+use surface\Factory;
+use surface\table\components\Button;
+use surface\table\components\Column;
+use surface\table\components\Header;
+use surface\table\components\Pagination;
+use surface\table\components\Selection;
+use surface\table\Table;
 use surface\table\Type;
+use iszsw\curd\model\Table as TableModel;
 
 class ResolveTable extends Resolve
 {
 
+    use Condition;
+
     /**
      * 默认配置
+     *
      * @var array
      */
-    private $default;
+    private $options;
 
     /**
      * 搜索条件
+     *
      * @var array
      */
     private $search;
 
     /**
      * 列项
+     *
      * @var array
      */
     private $column;
 
     /**
-     * 列解析
+     * 按钮操作
+     *
+     * @var array
      */
-    private function resolveColumn()
+    private $buttons;
+
+    /**
+     * @var Table
+     */
+    private $surfaceTable;
+
+    /**
+     * 获取列
+     *
+     * @return array<Component>
+     */
+    public function getColumn()
     {
-        foreach ($this->table['fields'] as $k => $f)
+        if (is_null($this->column))
         {
-            if (!$f['table_type']) {
-                continue;
-            }
-
-            $column = array_merge(json_decode($f['table_extend'], true) ?? [],
-                                  [
-                                      "type" => $f['table_type'],
-                                      "field" => $f['field'],
-                                      "title" => $f['title'],
-                                      "sort" => $f['table_sort'] ? true : null,
-                                  ]);
-
-            switch ($f['table_type']) {
-                case Type::IN:
-                    $column['options'] = $this->options($f[$f['option_type']], $f['option_type']);
-                    break;
-                case Type::SWITCH_EDIT:
-                case Type::SELECT_EDIT:
-                    $column['options'] = $this->options($f[$f['option_type']], $f['option_type']);
-                case Type::TEXT_EDIT:
-                    !isset($column['edit_url']) && $column['edit_url'] = builder_table_url('change', ['table' => $this->table['table']]);
-                    break;
-                default:
-            }
-            $this->column[$k] = $column;
+            $this->surfaceTable = Factory::table();
+            $this->resolveColumn();
         }
+
+        return $this->column;
     }
 
     /**
-     * 搜索解析
+     * 列解析
      */
-    private function resolveSearch()
+    private function resolveColumn(): void
     {
-        foreach ($this->table['fields'] as $v) {
-            if (!$v['search']) {
+        $this->column = [];
+        // Selection
+        $this->column[] = new Selection($this->table['pk']);
+
+        // columns
+        foreach ($this->table['fields'] as $k => $f)
+        {
+            if ($f['table_type'] == '0')
+            {
                 continue;
             }
-            if ($v['form_type'] == 'hidden') {
+
+            $type = $f['table_type'];
+            $prop = $f['field'];
+            $label = $f['title'];
+            $props = array_merge($f['table_extend'] ?? [], ["sortable" => $f['table_sort'] ? true : false,]);
+            $options = [];
+
+            switch ($f['table_type'])
+            {
+                case 'select':
+                case 'switcher':
+                    $options = $this->options($f[$f['option_type']], $f['option_type']);
+                    break;
+                default:
+            }
+
+            $this->column[] = $this->generateTable($type, $prop, $label, $props, $options);
+        }
+
+        // handle
+        $this->column[] = (new Column('_options', '操作'))->props('fixed', 'right')->scopedSlots($this->getButtons(TableModel::LOCAL_RIGHT));
+    }
+
+    private function getButtons($local = TableModel::LOCAL_TOP)
+    {
+        if (is_null($this->buttons))
+        {
+            $this->resolveButton();
+        }
+
+        return $this->buttons[$local] ?? [];
+    }
+
+    private function generateTable($type, $prop, $label, $props, array $options = []): Component
+    {
+        $component = $this->surfaceTable->column($prop, $label);
+        $component->props($props);
+        switch ($type)
+        {
+            case 'select':
+            case 'switcher':
+            case 'writable':
+                $child = $this->surfaceTable->$type()->props(
+                    [
+                        'options'     => $options,
+                        'async'       => [
+                            'method' => 'post',
+                            'data'   => ['id'],
+                            'url'    => Helper::builder_table_url('page/change', ['_table' => $this->table['table']]),
+                        ],
+                        'doneRefresh' => true,
+                    ]
+                );
+                break;
+            case 'expand':
+                $component->props(['type' => 'expand']);
+            default:
+                $child = (new Component())->el('span')->inject(['domProps' => 'innerHTML']);
+                break;
+        }
+        $component->scopedSlots([$child]);
+
+        return $component;
+    }
+
+    public function getSearch()
+    {
+        if (is_null($this->search))
+        {
+            $this->search = [];
+            $this->resolveSearch();
+        }
+
+        return $this->search;
+    }
+
+    private function resolveSearch()
+    {
+        foreach ($this->table['fields'] as $v)
+        {
+            if ( ! $v['search'])
+            {
+                continue;
+            }
+            if ($v['form_type'] == 'hidden')
+            {
                 $v['form_type'] = 'text';
             }
             $form = $this->resolveSearchColumn($v, input($v['field'], null));
-            if (isset($form['options'])) {
+            if (isset($form['options']))
+            {
                 $form['props']['options'] = $form['options'];
             }
             $this->search[] = [$v['search'], $form['type'], $form['field'], $form['title'], $form['value'], ['props' => $form['props']]];
@@ -87,112 +188,234 @@ class ResolveTable extends Resolve
     /**
      * 按钮解析
      */
-    private function resolveBtn()
+    private function resolveButton(): void
     {
-        $btn = json_decode($this->table['btn'], true);
-        if (count($btn) > 0) {
-            $defaultBtnNode = [1 => 'create', 2 => 'edit', 4 => 'delete'];
-            $defaultBtnNum = 0;
-            $topBtn = [];
-            $operations = [];
-            foreach ($btn as $k=>$v) {
-                if (in_array($v, $defaultBtnNode)) {
-                    $defaultBtnNum += array_search($v, $defaultBtnNode);
+        $button = $this->table['button'];
+        $this->buttons = [
+            TableModel::LOCAL_TOP   => [],
+            TableModel::LOCAL_RIGHT => [],
+        ];
+
+        if (count($this->table['fields']) > 0)
+        {
+            $i = 0;
+            $fields = array_values($this->table['fields']);
+            while (1)
+            {
+                if ( ! isset($fields[$i]))
+                {
+                    break;
+                }
+                if ($fields[$i]['search_type'] !== "0")
+                {
+                    array_unshift(
+                        $button, [
+                                   "icon"         => "el-icon-search",
+                                   "title"        => TableModel::$labels['search'],
+                                   "button_local" => TableModel::LOCAL_TOP,
+                                   "top_type"     => TableModel::BTN_TYPE_PAGE,
+                                   "url"          => Helper::builder_table_url('page/search', ['_table' => $this->table['table']]),
+                               ]
+                    );
+                }
+                $i++;
+            }
+            unset($fields);
+        }
+
+        $btn = array_reverse($this->table['button_default']);
+        foreach ($btn as $v)
+        {
+            switch ($v)
+            {
+                case TableModel::BUTTON_CREATE:
+                    array_unshift(
+                        $button, [
+                                   "doneRefresh"  => true,
+                                   "icon"         => "el-icon-plus",
+                                   "title"        => TableModel::$buttonDefaultLabels[TableModel::BUTTON_CREATE],
+                                   "button_local" => TableModel::LOCAL_TOP,
+                                   "top_type"     => TableModel::BTN_TYPE_PAGE,
+                                   "url"          => Helper::builder_table_url('page/create', ['_table' => $this->table['table']]),
+                               ]
+                    );
+                    break;
+                case TableModel::BUTTON_UPDATE:
+                    array_unshift(
+                        $button, [
+                                   "doneRefresh"  => true,
+                                   "icon"         => "el-icon-edit-outline",
+                                   "title"        => TableModel::$buttonDefaultLabels[TableModel::BUTTON_UPDATE],
+                                   "button_local" => TableModel::LOCAL_RIGHT,
+                                   "right_type"   => TableModel::BTN_TYPE_PAGE,
+                                   "data_extend"  => [$this->table['pk'],],
+                                   "url"          => Helper::builder_table_url('page/update', ['_table' => $this->table['table']]),
+                               ]
+                    );
+                    break;
+                case TableModel::BUTTON_DELETE:
+                    array_unshift(
+                        $button, [
+                                   "doneRefresh"  => true,
+                                   "icon"         => "el-icon-close",
+                                   "title"        => TableModel::$buttonDefaultLabels[TableModel::BUTTON_DELETE],
+                                   "button_local" => TableModel::LOCAL_TOP,
+                                   "top_type"     => TableModel::BTN_TYPE_SUBMIT,
+                                   "confirm_msg"  => "确认删除？",
+                                   "url"          => Helper::builder_table_url('page/delete', ['_table' => $this->table['table']]),
+                               ]
+                    );
+                    array_unshift(
+                        $button, [
+                                   "doneRefresh"  => true,
+                                   "icon"         => "el-icon-close",
+                                   "title"        => TableModel::$buttonDefaultLabels[TableModel::BUTTON_DELETE],
+                                   "button_local" => TableModel::LOCAL_RIGHT,
+                                   "right_type"   => TableModel::BTN_TYPE_CONFIRM,
+                                   "confirm_msg"  => "确认删除？",
+                                   "data_extend"  => [$this->table['pk']],
+                                   "url"          => Helper::builder_table_url('page/delete', ['_table' => $this->table['table']]),
+                               ]
+                    );
+                    break;
+                case TableModel::BUTTON_REFRESH:
+                    array_unshift(
+                        $button, [
+                                   "icon"         => "el-icon-refresh",
+                                   "title"        => TableModel::$buttonDefaultLabels[TableModel::BUTTON_REFRESH],
+                                   "button_local" => TableModel::LOCAL_TOP,
+                                   "top_type"     => TableModel::BTN_TYPE_REFRESH,
+                               ]
+                    );
+                    break;
+            }
+        }
+
+        foreach ($button as $b)
+        {
+            $this->buttons[$b['button_local']][] = $this->generateButton($b)->props('doneRefresh', $b['doneRefresh'] ?? false);
+        }
+    }
+
+    private function generateButton(array $param): Button
+    {
+        $param = array_merge(
+            [
+                "icon"         => "el-icon-setting",
+                "title"        => 'title',
+                "button_local" => "right",
+                "right_type"   => "page",
+                "url"          => '',
+                "data_extend"  => [],
+                "btn_extend"   => [],
+            ], $param
+        );
+
+        $btn = $this->surfaceTable->button($param['icon'], $param['title']);
+        $type = $param[$param['button_local'].'_type'];
+        switch ($type)
+        {
+            case TableModel::BTN_TYPE_PAGE:
+                $btn->createPage($param['url'], $param['data_extend'])->props('doneRefresh', true);
+                break;
+            case TableModel::BTN_TYPE_CONFIRM:
+                $btn->createConfirm($param['confirm_msg'] ?? '', ['method' => 'post', 'data' => $param['data_extend'], 'url' => $param['url']]);
+                break;
+            case TableModel::BTN_TYPE_REFRESH:
+                $btn->createRefresh();
+                break;
+            case TableModel::BTN_TYPE_SUBMIT:
+                $btn->createSubmit(
+                    [
+                        'method' => 'post',
+                        'data'   => $param['data_extend'],
+                        'url'    => $param['url'],
+                    ], $param['confirm_msg'] ?? '', $this->table['pk']
+                );
+                break;
+        }
+
+        if (count($param['btn_extend']) > 0)
+        {
+            $btn->props('prop', array_merge($btn->props['prop'] ?? [], $param['btn_extend']));
+        }
+
+        return $btn;
+    }
+
+    public function getHeader(): ?Header
+    {
+        $buttons = $this->getButtons(TableModel::LOCAL_TOP);
+
+        return count($buttons) < 1 ? null : (new Header())->children($buttons);
+    }
+
+    public function getOptions(): array
+    {
+        if (is_null($this->options))
+        {
+            $this->options = $this->table['extend'] ?? [];
+            $this->options = isset($this->options['props']) ? $this->options : ['props' => count($this->options) > 0 ? $this->options : (object)[]];
+        }
+
+        return $this->options;
+    }
+
+    public function getPagination(): Pagination
+    {
+        return (new Pagination())->props(
+            [
+                'async' => [
+                    'url' => Helper::builder_table_url('page', ['_table' => $this->table['table']]),
+                ],
+            ]
+        );
+    }
+
+    public function getData($where = [], $order = '', $page = 1, $limit = 15): array
+    {
+
+        $condition = [];
+        foreach ($where as $k => $v) {
+            if (!($field = $this->table['fields'][$k] ?? null) || $field['search_type'] === '0') continue;
+            $condition[] = $this->condition($field['search'], $k, $v);
+        }
+
+        $model = Model::instance($this->table['table'])->where($condition);
+        $count = $model->count();
+        $lists = $model->order($order ?: $this->table['pk'].' DESC')->page($page, $limit)->select()->toArray();
+
+        foreach ($lists as $k => $v)
+        {
+            foreach ($this->table['fields'] as $field => $config)
+            {
+                if ( ! $config['table_type'])
+                {
                     continue;
                 }
-                $btnDefault = [
-                    'local' => 'right',
-                    'type' => 'page',
-                    'title' => '',
-                    'params' => [],
-                    'faClass' => 'fa fa-list',
-                    'refresh' => true,
-                    'text' => '',
-                    'method' => 'POST',
-                ];
-                $v = explode(',', $v);
-                $v = array_combine(array_keys($btnDefault), array_pad($v, count($btnDefault), null));
-                foreach ($v as $kk => $vv) {
-                    if ($vv == null) {
-                        $v[$k] = $btnDefault[$kk];
-                    }
-                    if ($kk == 'params' && $vv) {
-                        $v[$kk] = explode('|', $vv);
-                    }
-                }
-
-                $k = builder_table_url($k);
-                $btn = \surface\table\Table::button($v['type'], $v['title'], [
-                    'params' => $v['params'],
-                    'title' => '编辑',
-                    'text' => $v['text'],
-                    'method' => $v['method'],
-                    'refresh' => $v['refresh'],
-                    'url'   => $k,
-                ], $v['faClass']);
-                if ($v['local'] == 'top') {
-                    $topBtn[] = $btn;
-                }else{
-                    $operations[] = $btn;
-                }
-            }
-            $defaultBtn = array_merge_recursive(create_table_btn($defaultBtnNum, ['table'=>$this->table['table'], $this->table['pk']], 'page/'), ['topBtn' => $topBtn, 'operations' => $operations]);
-            $this->default['topBtn'] = $defaultBtn['topBtn'];
-            $this->default['operations'] = $defaultBtn['operations'];
-        }
-    }
-
-    public function getSearch()
-    {
-        if (is_null( $this->search ) ) {
-            $this->search = [];
-            $this->resolveSearch();
-        }
-        return $this->search;
-    }
-
-    public function getDefault()
-    {
-        if (is_null( $this->default) ) {
-            $this->default = json_decode($this->table['extend'], true) ?? [];
-            $this->default['title'] = $this->table['title'];
-            $this->default['description'] = $this->table['description'];
-            $this->resolveBtn();
-        }
-        return $this->default;
-    }
-
-    public function getColumn(){
-        if (is_null( $this->column ) ) {
-            $this->resolveColumn();
-        }
-        return $this->column;
-    }
-
-    public function getData($where = [], $order = '', $page = 1, $row_num = 15): array
-    {
-        $model = Model::instance($this->table['table'])->where($where);
-        $count = $model->count();
-        $lists = $model->order($order)->page($page, $row_num)->select()->toArray();
-
-        foreach ($lists as $k => $v) {
-            foreach ($this->table['fields'] as $field => $config) {
-                if (!$config['table_type']) {continue;}
 
                 $value = $v[$field] ?? '';
 
                 if ($config["option_type"])
                 {
                     $row_pk = 0;
-                    if ($config['relation']) {
+                    if ($config['relation'])
+                    {
                         $relation = $config['option_remote_relation'];
                         $row_pk = $v[$relation[1]];
                     }
-                    $value = $this->initFieldVal($value, $config['table_type'], $config["option_type"], $config[$config['option_type']] ?? '', $row_pk);
+                    $value = $this->initFieldVal(
+                        $value, $config['table_type'], $config["option_type"], $config[$config['option_type']] ?? '', $row_pk
+                    );
                 }
 
-                if ($config["table_format"] ?? false) {
+                if ($config["table_format"] ?? false)
+                {
                     $value = $this->initFormat($config["table_format"], $value, $v);
+                }
+
+                if (is_array($value)) {
+                    $value = implode(',', $value);
                 }
 
                 $lists[$k][$field] = $value;
@@ -201,7 +424,7 @@ class ResolveTable extends Resolve
 
         return [
             'count' => $count,
-            'list' => $lists
+            'list'  => $lists,
         ];
     }
 }

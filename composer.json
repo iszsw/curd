@@ -1,38 +1,40 @@
 {
-  "name": "iszsw/porter",
-  "description": "Mysql数据表生成页面",
-  "license": "MIT",
-  "authors": [
-    {
-      "name": "zsw",
-      "email": "zswemail@qq.com"
-    }
-  ],
-  "homepage": "https://zsw.ink/",
-  "keywords": [
-    "thinkphp",
-    "iszsw",
-    "porter"
-  ],
-  "require": {
-    "iszsw/surface": "^1.0"
-  },
-  "autoload": {
-    "psr-4": {
-      "iszsw\\porter\\": "src"
+    "name": "iszsw/curd",
+    "description": "Mysql数据表生成CURD页面",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "zsw",
+            "email": "zswemail@qq.com"
+        }
+    ],
+    "homepage": "https://zsw.ink/",
+    "keywords": [
+        "ThinkPHP",
+        "iszsw",
+        "curd"
+    ],
+    "require": {
+        "iszsw/surface": "~1.2.0"
     },
-    "files": [
-      "src/helper.php"
-    ]
-  },
-  "extra": {
-    "think": {
-      "services": [
-        "iszsw\\porter\\Service"
-      ],
-      "config": {
-        "porter": "src/config.php"
-      }
+    "autoload": {
+        "psr-4": {
+            "iszsw\\curd\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "iszsw\\curd\\test\\": "test"
+        }
+    },
+    "extra": {
+        "think": {
+            "services": [
+                "iszsw\\curd\\Service"
+            ],
+            "config": {
+                "porter": "src/config.php"
+            }
+        }
     }
-  }
 }

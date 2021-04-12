@@ -1,10 +1,10 @@
 <?php
 /**
  * Author: zsw zswemail@qq.com
- * Date: 2019/11/25 10:11
+ *
  */
 
-namespace iszsw\porter\lib;
+namespace iszsw\curd\lib;
 
 use surface\table\Type;
 
@@ -19,23 +19,36 @@ abstract class Resolve
     public function __construct($table)
     {
         $this->table = Manage::instance()->table($table);
-        if (!$this->table) {
-            throw new \Exception("表【{$table}】不存在");
+        if ( ! $this->table)
+        {
+            _error("表【{$table}】不存在");
         }
     }
 
-    protected function options($val, $type) :array
+    /**
+     * 默认最大限制为100条 如果需要大量数据选择请使用 take组件
+     *
+     * @param       $val
+     * @param       $type
+     * @param array $values
+     *
+     * @return array
+     */
+    protected function options($val, $type, array $values = []): array
     {
         $option = [];
-        switch ($type) {
+        switch ($type)
+        {
             case 'option_remote_relation':
-                if (count($val) === 7) {
-                    $option = Model::instance($val[4])->column($val[6], $val[5]);
+                if (count($val) === 7)
+                {
+                    $option = Model::instance($val[4])->where(count($values) > 0 ? [[$val[5], 'in', $values]] : [])->limit(100)->column($val[6], $val[5]);
                 }
                 break;
             case 'option_relation':
-                if (count($val) === 3) {
-                    $option = Model::instance($val[0])->column($val[2], $val[1]);
+                if (count($val) === 3)
+                {
+                    $option = Model::instance($val[0])->where(count($values) > 0 ? [[$val[1], 'in', $values]] : [])->limit(100)->column($val[2], $val[1]);
                 }
                 break;
             case 'option_config':
@@ -43,8 +56,9 @@ abstract class Resolve
                 break;
             case 'option_lang':
             default:
-                $option = __('?' . $val) ? __($val) : '';
+                $option = __('?'.$val) ? __($val) : [];
         }
+
         return $option;
     }
 
@@ -55,25 +69,31 @@ abstract class Resolve
      * @param $table_type       表格类型  text text_edit ....
      * @param $option_type      字段配置类型 option_default option_config...
      * @param $option_config    字段配置参数
-     * @param $pk string        当前列主键值
+     * @param $pk               string        当前列主键值
      *
      * @return string
      * Author: zsw zswemail@qq.com
      */
     protected function initFieldVal($val, $table_type, $option_type, $option_config, $pk = '')
     {
-        $allow = [Type::TEXT, Type::LONG_TEXT, Type::HTML];
-        if (in_array($table_type, $allow)) {
-            switch ($option_type) {
+        $allow = ['column', 'expand'];
+        if (in_array($table_type, $allow))
+        {
+            switch ($option_type)
+            {
                 case 'option_remote_relation':
                     $val = Model::instance($option_config[4])
-                        ->where($option_config[5], 'IN', function ($query) use ($option_config, $pk) {
+                        ->where(
+                            $option_config[5], 'IN', function ($query) use ($option_config, $pk)
+                        {
                             $query->table($option_config[0])->where($option_config[2], $pk)->field($option_config[3]);
-                        })
+                        }
+                        )
                         ->column($option_config[6], $option_config[5]);
                     break;
                 case 'option_relation':
-                    if (count($option_config) === 3) {
+                    if (count($option_config) === 3)
+                    {
                         $val = Model::instance($option_config[0])->where([$option_config[1] => $val])->value($option_config[2]);
                     }
                     break;
@@ -82,7 +102,7 @@ abstract class Resolve
                     $val = $option[$val];
                     break;
                 case 'option_lang':
-                    $option = __('?' . $option_config) ? __($option_config) : '';
+                    $option = __('?'.$option_config) ? __($option_config) : '';
                     $val = $option[$val];
             }
         }
@@ -98,53 +118,9 @@ abstract class Resolve
      *
      * @return array
      */
-    protected function resolveSearchColumn(array $field, $default = null) :array
+    protected function resolveSearchColumn(array $field, $default = null): array
     {
         return $this->resolveColumnByProps(json_decode($field['search_extend'], true) ?? [], $field, $default, $field['search_type']);
-    }
-
-    /**
-     * 表单参数配置解析
-     *
-     * @param      $field
-     * @param null $default 默认值
-     *
-     * @return array
-     */
-    protected function resolveFormColumn(array $field, $default = null) :array
-    {
-        return $this->resolveColumnByProps(json_decode($field['form_extend'], true) ?? [], $field, $default, $field['form_type']);
-    }
-
-    protected function resolveColumnByProps(array $props, array $field, $default, $type = 'text')
-    {
-        if (!$type) {return [];}
-        $column = ['type' => $type, 'field' => $field['field'], 'title' => $field['title'], 'value' => !$default ? $field['default'] : $default, 'props' => $props];
-        switch ($type) {
-            case 'cascader':
-            case 'select':
-            case 'selects':
-            case 'radio':
-            case 'checkbox':
-            case 'switcher':
-                if ($field['relation']) { // 扩展字段
-                    $column['options'] = $this->options($field['option_remote_relation'], 'option_remote_relation');
-                }else{
-                    $column['options'] = $this->options($field[$field['option_type']], $field['option_type']);
-                }
-                break;
-            case 'frame':
-                $column['props'] = array_merge([
-                    'src'=> '',         // 文件地址
-                    'type'=>'file',     // 文件类型
-                    'width'=>'95%',
-                    'height'=>'calc(100vh - 200px)',
-                    'maxLength' => 1,   // 选取长度
-                    'title' => "请选择", // 说明
-                ], $column['props']);
-            default:
-        }
-        return $column;
     }
 
     /**
@@ -158,25 +134,29 @@ abstract class Resolve
      */
     protected function resolveFormDefault(array $field, $default = '', $data = [])
     {
-        $type = $field['form_type'];
-
-        if ($field['relation']) { // 扩展字段
+        if ($field['relation'])
+        { // 扩展字段
             $remote_relation = $field['option_remote_relation'];
             $default = Model::instance($remote_relation[0])->where($remote_relation[2], $data[$remote_relation[1]])->column($remote_relation[3]);
             $default = array_values($default);
-        }else{
-            switch ($type) {
+        } else
+        {
+            switch ($field['form_type'])
+            {
                 case 'cascader':
                 case 'select':
                 case 'selects':
                 case 'radio':
                 case 'checkbox':
                 case 'switcher':
-                $default = json_decode($default, true) ?? '';
+                case 'upload':
+                case 'take':
+                    $default = json_decode($default, true) ?? $default;
                     break;
                 default:
             }
         }
+
         return $default;
     }
 

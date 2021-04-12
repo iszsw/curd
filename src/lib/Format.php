@@ -1,12 +1,12 @@
 <?php
 /**
  * Author: zsw zswemail@qq.com
- * Date: 2019/11/25 10:11
+ *
  */
 
-namespace iszsw\porter\lib;
+namespace iszsw\curd\lib;
 
-use iszsw\porter\model\Table;
+use iszsw\curd\model\Table;
 /**
  * 格式处理
  * Author: zsw zswemail@qq.com
@@ -51,5 +51,5 @@ class Format
         }
         return $function(...$args);
     }
-    
+
 }

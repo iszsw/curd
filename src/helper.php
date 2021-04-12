@@ -1,117 +1,126 @@
 <?php
 
-use surface\table\Table;
+namespace iszsw\curd;
 
-if (!function_exists('create_table_btn')) {
-    /**
-     * 默认生成table的操作图标
-     * 1 create
-     * 2 edit
-     * 3 create + edit
-     * 4 delete
-     * 5 create + delete
-     * 6 edit + delete
-     * 7 create + edit + delete
-     *
-     * @param int $handle 表单会携带当前列的数据一起提交
-     * @param string|array $params ['id'(读取列字段参数), 'id'=>1(设置默认携带参数)]
-     * @return array
-     */
-    function create_table_btn($handle = 7, $params = 'id', $prefix = '')
-    {
-        $top = [];
-        $operations = [];
-        $ext = [];
-        if (is_array($params)) {
-            foreach ($params as $k => $p) {
-                if (!is_numeric($k)) {
-                    $ext[$k] = $p;
-                    unset($params[$k]);
-                }
-            }
-        } elseif (is_string($params)) {
-            $params = format_explode($params, ',');
-        }
+use iszsw\curd\model\Table;
 
-        if (1 === ($handle & 1)) {
-            $createUrl = builder_table_url($prefix . 'create', $ext);
-            $top[] = Table::button(
-                'page', '', [
-                'title' => "添加",
-                'refresh' => true,
-                'url' => $createUrl,
-            ], 'fa fa-plus');
-        }
+/**
+ * 助手类
+ *
+ * @package iszsw\curd
+ * Author: zsw zswemail@qq.com
+ */
+class Helper
+{
 
-        if (2 === ($handle & 2)) {
-            $editUrl = builder_table_url($prefix . 'edit', $ext);
-            $operations[] = Table::button('page', '', [
-                'title' => '编辑',
-                'url' => $editUrl,
-                'method' => 'get',
-                'refresh' => true,
-                'params' => $params,
-            ], 'fa fa-edit');
-        }
-        if (4 === ($handle & 4)) {
-            $deleteUrl = builder_table_url($prefix . 'delete', $ext);
-            $top[] = Table::button('submit', '', [
-                'text' => '确认删除选中项？',
-                'url' => $deleteUrl,
-                'method' => 'POST',
-                'refresh' => true,
-            ], 'fa fa-remove');
-            $operations[] = Table::button(
-                'confirm', '', [
-                'text' => '确认删除？',
-                'url' => $deleteUrl,
-                'method' => 'POST',
-                'refresh' => true,
-                'params' => $params,
-            ], 'fa fa-remove');
-        }
-
-        return [
-            'topBtn' => $top,
-            'operations' => $operations,
-        ];
-    }
-}
-
-if (!function_exists('format_explode')) {
-    /**
-     * 带过滤的 explode
-     *
-     * explode 方法格式化
-     * @param $str
-     * @param string $delimiter
-     * @return array
-     * Author: zsw zswemail@qq.com
-     */
-    function format_explode($str, $delimiter = ',')
-    {
-        return array_map('trim', array_filter(explode($delimiter, $str)));
-    }
-}
-
-
-if (!function_exists('builder_table_url')) {
     /**
      * 生成 Table Url 地址
      *
      * @param string $url
      * @param array $param
      * @param bool|string $domain
+     *
      * @return string
-     * Author: zsw zswemail@qq.com
      */
-    function builder_table_url(string $url, array $param = [], $domain = false)
+    public static function builder_table_url(string $url, array $param = [], $domain = false)
     {
-        $url = '/' . config('porter.route_prefix') . '/' . trim($url, "\\/");
+        $url = '/' . config('curd.route_prefix') . '/' . trim($url, "\\/");
         $domain && $url = request()->domain() . $url;
         if ($param) {
             $url .= (strpos( $url, '?' ) === false ? '?' : '&' ) .http_build_query($param);
         }
         return $url;
     }
+
+    /**
+     * 格式化options参数
+     *
+     * @param array  $options
+     * @param string $labelName value名称
+     * @param string $valueName key名称
+     *
+     * @return array
+     */
+    public static function formatOptions(array $options, $labelName = Table::LABEL, $valueName = Table::VALUE): array
+    {
+        $data = [];
+        foreach ($options as $k => $v) {
+            array_push($data, [$labelName => $v, $valueName => $k]);
+        }
+        return $data;
+    }
+
+    /**
+     * 格式化数组转普通数组
+     *
+     * @param array  $options
+     * @param string $keyName   作为键的参数
+     * @param string $valueName 作为值的参数
+     *
+     * @return array
+     */
+    public static function simpleOptions(array $options, $keyName = Table::KEY, $valueName = Table::VALUE): array
+    {
+        $data = [];
+        foreach ($options as $v) {
+            $data[$v[$keyName]] = $v[$valueName];
+        }
+        return $data;
+    }
+
+    /**
+     * 参数格式化
+     *
+     * @param string|array $data
+     * @return array
+     */
+    public static function formatValue($data)
+    {
+        if (is_array($data)) {
+            foreach ($data as $k => $v) {
+                $data[$k] = static::formatValue($v);
+            }
+        }else{
+            switch (1) {
+                case is_numeric($data):
+                    $data = strpos('.', (string)$data) === false ? (int)$data : (float)$data;
+                    break;
+                case is_string($data):
+                    $data = (string)$data;
+                    break;
+                case is_bool($data):
+                    $data = (bool)$data;
+                    break;
+            }
+        }
+        return $data;
+    }
+
+    /**
+     * 数组深度合并 相同KEY值 如果是数组合并 如果是字符串覆盖
+     *
+     * @param array $original
+     * @param array $extend
+     * @param bool $main   只处理一级
+     *
+     * @return array
+     */
+    public static function extends(array $original, array $extend, $main = false):array
+    {
+        foreach ($extend as $k => $v) {
+            $original[$k] = isset($original[$k]) && is_array($original[$k]) ? ($main ? $v : static::extends($original[$k], (array)$v)) : $v;
+        }
+        return $original;
+    }
+
+    public static function success($msg, $data = []){
+        return json(['code' => 0, 'msg'  => $msg, 'data' => $data]);
+    }
+
+    public static function error($msg, $data){
+        return json(['code' => 1, 'msg'  => $msg, 'data' => $data]);
+    }
+
 }
+
+

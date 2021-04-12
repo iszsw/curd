@@ -1,16 +1,17 @@
 <?php
 
-namespace iszsw\porter\lib\engine;
+namespace iszsw\curd\lib\engine;
 
-use iszsw\porter\lib\Manage;
-use iszsw\porter\model\Table;
+use iszsw\curd\Helper;
+use iszsw\curd\lib\Manage;
+use iszsw\curd\model\Table;
 
 /**
  * 文件引擎 配置文件保存到data/
  *
  * Class File
  *
- * @package iszsw\porter\lib\engine
+ * @package iszsw\curd\lib\engine
  * Author: zsw zswemail@qq.com
  */
 class File extends Manage
@@ -18,25 +19,20 @@ class File extends Manage
 
     private $suffix = '.php';
 
-    private $config = [
-        'save_path' => ''
-    ];
+    private $path;
 
-    public function init($config = [])
+    public function init()
     {
-        $this->config = array_merge($this->config, $config);
-
-        if(
-            !(is_dir($this->config['save_path']) || mkdir($this->config['save_path'], 0777, true))
-            || !is_writable($this->config['save_path'])
-        ) {
-            throw new \Exception('数据表配置文件路径 '.$this->config['save_path'].' 不存在或者不可写');
+        $tablePath = $this->config['save_path'];
+        if (!is_dir($tablePath)) {
+            mkdir($tablePath, 0777, true);
         }
+        $this->path = $tablePath;
     }
 
     private function getTableFilePath($table)
     {
-        return $this->config['save_path'] . $table . $this->suffix;
+        return $this->path . $table . $this->suffix;
     }
 
     private function getData($table)
@@ -58,6 +54,7 @@ class File extends Manage
             $tableData = $this->getData($v['table']);
             if (!is_array($tableData) || count($tableData) < 1) {
                 $this->save($v);
+                $tableData = $this->getData($v['table']);
             }
             $default[$k] = array_merge($v, $tableData);
         }
@@ -94,7 +91,7 @@ class File extends Manage
 
         // fields 排序
         if (count($fieldInfo) > 1) {
-            $sort = array_column($fieldInfo,'sort');
+            $sort = array_column($fieldInfo,'weight');
             array_multisort($sort,SORT_DESC, $fieldInfo);
         }
 
@@ -120,11 +117,10 @@ class File extends Manage
                 throw new \Exception(Table::$labels['option_remote_relation'] . "不能为空");
             }
         }
-
         foreach ($this->fieldsInfo($table) as $f) {
             $field = $f['field'];
             if (isset($oldFields[$field])) {
-                $fields[$field] = array_merge($oldFields[$field], $fields[$field] ?? []);
+                $fields[$field] = Helper::extends($oldFields[$field], $fields[$field] ?? [], true);
                 unset($oldFields[$field]);
             }else{
                 if ($f['key'] === 'PRI') { // 主键默认值
@@ -146,25 +142,23 @@ class File extends Manage
         }
 
         // fields 排序
-        $sort = array_column($fields,'sort');
+        $sort = array_column($fields,'weight');
         array_multisort($sort,SORT_DESC, $fields);
 
         $data = array_merge($info, $data);
         $data['fields'] = $fields;
 
+        // 格式化字段
+        $data['extend'] = $data['extend'] ? Helper::simpleOptions($data['extend']) : [];
+        foreach ($data['button'] as $k => $b) {
+            $b['btn_extend'] = Helper::simpleOptions($b['btn_extend']);
+            $b['data_extend'] = Helper::simpleOptions($b['data_extend']);
+            $data['button'][$k] = $b;
+        }
+
         return $this->saveData($table, $data);
     }
 
-    /**
-     * @param      $table 删除表
-     * @param null $field 删除字段
-     *
-     * @return mixed|void
-     * @throws \app\exception\BaseException
-     * @throws \think\db\BindParamException
-     * @throws \think\db\PDOException
-     * Author: zsw zswemail@qq.com
-     */
     public function delete($table, $fields = null)
     {
         foreach ((array)$table as $t) {

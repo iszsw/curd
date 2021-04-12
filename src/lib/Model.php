@@ -1,12 +1,9 @@
 <?php
 /**
  * Author: zsw zswemail@qq.com
- * Date: 2019/11/25 10:11
  */
 
-namespace iszsw\porter\lib;
-
-use think\facade\Db;
+namespace iszsw\curd\lib;
 
 class Model
 {
@@ -151,12 +148,12 @@ class Model
 
             // 远程更新
             if (count($relation) > 0) {
-                if (!$pk) {
-                    $pk = $this->model->getLastInsID();
-                }
+                if (!$pk) {$pk = $this->model->getLastInsID();}
+
                 foreach ($relation as $f => $val) {
                     $remote_relation_config = $this->config['fields'][$f]['option_remote_relation'];
                     $middleModel = static::instance($remote_relation_config[0]);
+                    $remoteModel = static::instance($remote_relation_config[4]);
 
                     $columns = $middleModel->where($remote_relation_config[2], $pk)->column($remote_relation_config[3], $middleModel->getPk());
                     $insert = [];
@@ -164,9 +161,13 @@ class Model
                         if (false !== $index = array_search($v, $columns)) {
                             unset($columns[$index]);
                         }else{
+                            // 默认 数字为PK
+                            if (!$remote_id = $remoteModel->where([is_numeric($v) ? $remote_relation_config[5] : $remote_relation_config[6] => $v])->value('id')){
+                                $remote_id = $remoteModel->insertGetId([$remote_relation_config[6] => $v]);
+                            }
                             $insert[] = [
                                 $remote_relation_config[2] => $pk,
-                                $remote_relation_config[3] => $v,
+                                $remote_relation_config[3] => $remote_id,
                             ];
                         }
                     }
