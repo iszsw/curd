@@ -42,7 +42,7 @@ class Form implements FormInterface
         $remote_relation_state = ($create || ($data['relation'] ?? true));
 
         $searchChildren = [
-            (new Select("search_type", TableModel::$labels["search_type"], $data['search_type'] ?? "0"))->options($formTypes),
+            (new Select("search_type", TableModel::$labels["search_type"], $data['search_type'] ?? "_"))->options($formTypes),
             (new Select("search", TableModel::$labels["matching"], $data['search'] ?? '='))
                 ->options(Helper::formatOptions(TableModel::$searchType))
                 ->visible([['exec' => 'model.search_type !== "0"']]),
@@ -55,7 +55,7 @@ class Form implements FormInterface
         ];
 
         $tableChildren = [
-            (new Select("table_type", TableModel::$labels["table_type"], $data['table_type'] ?? "0"))
+            (new Select("table_type", TableModel::$labels["table_type"], $data['table_type'] ?? "_"))
                 ->options($tableTypes),
             (new Select("table_format", TableModel::$labels["table_format"], $data['table_format'] ?? ''))
                 ->props(['allow-create'=> true, 'filterable' => true, 'multiple' => true, 'default-first-option' => true])
@@ -73,7 +73,7 @@ class Form implements FormInterface
         ];
 
         $formChildren = [
-            (new Select("form_type", TableModel::$labels["form_type"], $data['form_type'] ?? "0"))
+            (new Select("form_type", TableModel::$labels["form_type"], $data['form_type'] ?? "_"))
                 ->options($formTypes),
             (new Select("form_format", TableModel::$labels["form_format"], $data['form_format'] ?? ''))
                 ->props(['allow-create'=> true, 'filterable' => true, 'multiple' => true, 'default-first-option' => true])
@@ -172,7 +172,7 @@ class Form implements FormInterface
                                   ]))->marker('非‘默认’时 将读取相应配置 作为select radio等选项'),
 
                     (new Hidden('option_default', 1))->visible([['prop' => 'option_type', 'value' => 'option_default']]),
-                    (new Arrays('option_config', TableModel::$labels['option_config'], $data['option_config'] ?: []))->options(
+                    (new Arrays('option_config', TableModel::$labels['option_config'], Helper::formatOptions($data['option_config'] ?? [], TableModel::VALUE, TableModel::KEY)))->options(
                         [
                             (new Input(TableModel::KEY, TableModel::$labels[TableModel::KEY]))->item(false),
                             (new Input(TableModel::VALUE, TableModel::$labels[TableModel::VALUE]))->item(false),
@@ -218,8 +218,8 @@ class Form implements FormInterface
             $table = $post['table'];
             $field = $post['field'];
             $post['relation'] = !!$post['relation'];
-            foreach (['form_extend', 'search_extend', 'table_extend'] as $k) {
-                $post[$k] = Helper::formatValue(Helper::simpleOptions($post[$k]));
+            foreach (['form_extend', 'search_extend', 'table_extend', 'option_config'] as $k) {
+                $post[$k] = Helper::simpleOptions($post[$k]);
             }
             Manage::instance()->save(['table' => $table, 'fields' => [$field => $post]]);
         } catch (\Exception $e)

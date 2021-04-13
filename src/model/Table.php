@@ -160,7 +160,7 @@ class Table
     public static function getTableServersLabels()
     {
         return [
-            "0"         => "不显示",
+            "_"         => "不显示",
             "column"    => "文本",
             "writable"  => "可编辑文本",
             "select"    => "可编辑下拉",
@@ -173,7 +173,7 @@ class Table
     public static function getFormServersLabels()
     {
         return [
-            "0"        => "不显示",
+            "_"        => "不显示",
             "input"    => "文本框",
             "radio"    => "单选",
             "checkbox" => "多选",

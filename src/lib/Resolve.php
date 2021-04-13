@@ -6,7 +6,6 @@
 
 namespace iszsw\curd\lib;
 
-use iszsw\curd\Helper;
 use surface\table\Type;
 
 abstract class Resolve
@@ -22,7 +21,7 @@ abstract class Resolve
         $this->table = Manage::instance()->table($table);
         if ( ! $this->table)
         {
-            throw new \Exception("表【{$table}】不存在");
+            _error("表【{$table}】不存在");
         }
     }
 
@@ -53,7 +52,7 @@ abstract class Resolve
                 }
                 break;
             case 'option_config':
-                $option = json_decode($val, true) ?? [];
+                $option = $val;
                 break;
             case 'option_lang':
             default:
@@ -99,8 +98,7 @@ abstract class Resolve
                     }
                     break;
                 case 'option_config':
-                    $option = json_decode($option_config, true) ?? [];
-                    $val = $option[$val];
+                    $val = $option_config[$val];
                     break;
                 case 'option_lang':
                     $option = __('?'.$option_config) ? __($option_config) : '';

@@ -84,7 +84,7 @@ class ResolveTable extends Resolve
         // columns
         foreach ($this->table['fields'] as $k => $f)
         {
-            if ($f['table_type'] == '0')
+            if ($f['table_type'] == '_')
             {
                 continue;
             }
@@ -206,7 +206,7 @@ class ResolveTable extends Resolve
                 {
                     break;
                 }
-                if ($fields[$i]['search_type'] !== "0")
+                if ($fields[$i]['search_type'] !== "_")
                 {
                     array_unshift(
                         $button, [

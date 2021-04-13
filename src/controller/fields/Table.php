@@ -44,7 +44,7 @@ class Table implements TableInterface
         {
             $v['id'] = $v['field'];
             $v['field_label'] = $v['field'].((isset($v['key']) && $v['key']) ? "【{$v['key']}】" : '') . ($v['relation'] ? '【增】' : '');
-            $v['search'] =  $formTypes[$v['search_type']] . ($v['search_type'] !== '0' ? "  【{$v['search']}】 " : '');
+            $v['search'] =  $formTypes[$v['search_type']] . ($v['search_type'] !== '_' ? "  【{$v['search']}】 " : '');
         }
         unset($v);
 

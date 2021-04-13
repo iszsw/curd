@@ -69,34 +69,6 @@ class Helper
     }
 
     /**
-     * 参数格式化
-     *
-     * @param string|array $data
-     * @return array
-     */
-    public static function formatValue($data)
-    {
-        if (is_array($data)) {
-            foreach ($data as $k => $v) {
-                $data[$k] = static::formatValue($v);
-            }
-        }else{
-            switch (1) {
-                case is_numeric($data):
-                    $data = strpos('.', (string)$data) === false ? (int)$data : (float)$data;
-                    break;
-                case is_string($data):
-                    $data = (string)$data;
-                    break;
-                case is_bool($data):
-                    $data = (bool)$data;
-                    break;
-            }
-        }
-        return $data;
-    }
-
-    /**
      * 数组深度合并 相同KEY值 如果是数组合并 如果是字符串覆盖
      *
      * @param array $original

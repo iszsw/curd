@@ -202,7 +202,7 @@ abstract class Manage
                     'auto_increment'=> strpos($info['Extra'], 'auto_increment') !== false,
                     'weight'        => $weight,
 
-                    "search_type"   => "0",
+                    "search_type"   => "_",
                     "search"        => "=",
                     "search_extend" => [],
 
@@ -219,7 +219,7 @@ abstract class Manage
 
                     'relation'               => false,
                     'option_type'            => 'option_default',
-                    'option_config'          => '',
+                    'option_config'          => [],
                     'option_lang'            => '',
                     'option_relation'        => '',
                     'option_remote_relation' => '',
