@@ -77,7 +77,7 @@ class Form implements FormInterface
                 ->options($formTypes),
             (new Select("form_format", TableModel::$labels["form_format"], $data['form_format'] ?? ''))
                 ->props(['allow-create'=> true, 'filterable' => true, 'multiple' => true, 'default-first-option' => true])
-                ->options(TableModel::$formatTypes)
+                ->options(Helper::formatOptions(TableModel::$formatTypes))
                 ->marker(
                     "表单中显示该字段时会触发 多选会按顺序依次执行<br>1.PHP方法,自定义方法,类静态方法（datetime | user_func | class::method）参数（当前值，当前列） <br>2.内容替换冒号开头"
                     .htmlspecialchars("(:<b>{data}</b>)")
@@ -93,7 +93,7 @@ class Form implements FormInterface
         $saveChildren = [
             (new Select("save_format", TableModel::$labels["save_format"], $data['save_format'] ?? ""))
                 ->props(['allow-create'=> true, 'filterable' => true, 'multiple' => true, 'default-first-option' => true])
-                ->options(TableModel::$formatTypes)
+                ->options(Helper::formatOptions(TableModel::$formatTypes))
                 ->marker(
                     "保存该字段时会触发 多选会按顺序依次执行<br>1.PHP方法,自定义方法,类静态方法（datetime | user_func | class::method）参数（当前值，当前列） <br>2.内容替换冒号开头"
                     .htmlspecialchars("(:<b>{data}</b>)")

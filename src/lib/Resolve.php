@@ -6,6 +6,7 @@
 
 namespace iszsw\curd\lib;
 
+use iszsw\curd\Helper;
 use surface\table\Type;
 
 abstract class Resolve
@@ -21,7 +22,7 @@ abstract class Resolve
         $this->table = Manage::instance()->table($table);
         if ( ! $this->table)
         {
-            _error("表【{$table}】不存在");
+            throw new \Exception("表【{$table}】不存在");
         }
     }
 
