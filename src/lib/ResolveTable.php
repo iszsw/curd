@@ -217,6 +217,7 @@ class ResolveTable extends Resolve
                                    "url"          => Helper::builder_table_url('page/search', ['_table' => $this->table['table']]),
                                ]
                     );
+                    break;
                 }
                 $i++;
             }
