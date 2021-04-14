@@ -39,12 +39,7 @@ class Form implements FormInterface
 
     public function save()
     {
-        $post    = input();
-        $model   = Model::instance($this->form->table);
-        if (true === $status = $model->save($post)) {
-            return isset($post[$model->getPk()]) && $post[$model->getPk()];
-        }
-        return false;
+        return Model::instance($this->form->table)->save(input());
     }
 
 

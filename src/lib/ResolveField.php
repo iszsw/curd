@@ -48,12 +48,13 @@ class ResolveField extends Resolve
      *
      * @param      $field
      * @param null $default 默认值
+     * @param string $type 类型
      *
      * @return array
      */
-    protected function resolveFormColumn(array $field, $default = null): array
+    protected function resolveFormColumn(array $field, $default = null, $type = 'input'): array
     {
-        return $this->resolveColumnByProps($field['form_extend'], $field, $default, $field['form_type']);
+        return $this->resolveColumnByProps($field['form_extend'], $field, $default, $type);
     }
 
     protected function resolveColumnByProps(array $props, array $field, $default, $type = 'input')
@@ -102,8 +103,9 @@ class ResolveField extends Resolve
         }
         $columns = [];
         foreach ($this->table['fields'] as $k => $config) {
-            if ($search && $config['search_type'] === "_") continue;
-            $column = $this->resolveFormColumn($config, $this->data[$config['field']] ?? null);
+            $type = $config[$search ? 'search_type' : 'form_type'];
+            if ( $type=== "_" ) continue;
+            $column = $this->resolveFormColumn($config, $this->data[$config['field']] ?? null, $type);
             if (count($column) > 0) {
                 if (count($config["form_format"]) > 0) {
                     $column['value'] = $this->initFormat($config["form_format"], $column['value']);

@@ -2,6 +2,7 @@
 
 namespace iszsw\curd\controller;
 
+use iszsw\curd\Helper;
 use iszsw\curd\lib\Manage;
 
 class Fields extends Common
@@ -58,7 +59,7 @@ class Fields extends Common
                 break;
         }
 
-        return _success('', ['list' => $data]);
+        return Helper::success('', ['list' => $data]);
     }
 
     private function getRelationFields($table, $leaf = false)
@@ -91,9 +92,9 @@ class Fields extends Common
 
     public function delete($table, $field)
     {
-        if ( ! $field) _error('请选择需要删除的字段');
+        if ( ! $field) return Helper::error('请选择需要删除的字段');
         Manage::instance()->delete($table, $field);
-        _success(['delete', 'success']);
+        return Helper::success('删除成功');
     }
 
     public function change($table, $id, $field, $value)
@@ -104,9 +105,9 @@ class Fields extends Common
             Manage::instance()->save(['table' => $table, 'fields' => [$id => [$field=>$value]]]);
         } catch (\Exception $e)
         {
-            _error($e->getMessage() ?: '修改失败');
+            return Helper::error($e->getMessage() ?: '修改失败');;
         }
-        _success('修改成功');
+        return Helper::success('修改成功');
     }
 
 }
