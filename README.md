@@ -13,7 +13,7 @@
 - 多表关联、一对一、一对多、远程一对多
 
 ##文档
-[https://www.kancloud.cn/zswok/think-curd/2233243](https://www.kancloud.cn/zswok/think-curd/2233243)
+[https://www.kancloud.cn/zswok/think-curd](https://www.kancloud.cn/zswok/think-curd)
 
 ## 演示
 
