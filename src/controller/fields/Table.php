@@ -6,17 +6,16 @@ namespace iszsw\curd\controller\fields;
 use iszsw\curd\Helper;
 use iszsw\curd\lib\Manage;
 use iszsw\curd\model\Table as TableModel;
-use surface\helper\TableInterface;
+use surface\Component;
+use surface\helper\AbstractTable;
 
 use surface\table\components\Switcher;
 use surface\table\components\Button;
 use surface\table\components\Column;
-use surface\table\components\Header;
-use surface\table\components\Pagination;
 use surface\table\components\Select;
 use surface\table\components\Writable;
 
-class Table implements TableInterface
+class Table extends AbstractTable
 {
 
     private $table;
@@ -26,9 +25,9 @@ class Table implements TableInterface
         $this->table = input('table', '');
     }
 
-    public function header(): ?Header
+    public function header(): ?Component
     {
-        return (new Header(['el' => 'div']))->children(
+        return (new Component(['el' => 'div']))->children(
             [
                 (new Button('el-icon-plus', '添加'))->createPage(Helper::builder_table_url('fields/update', ['table'=>$this->table]))->props('doneRefresh', true),
                 (new Button('el-icon-refresh', '刷新'))->createRefresh()->props('doneRefresh', true),
@@ -122,7 +121,7 @@ class Table implements TableInterface
 
     }
 
-    public function pagination(): ?Pagination
+    public function pagination(): ?Component
     {
         return null;
     }

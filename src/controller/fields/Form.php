@@ -13,16 +13,15 @@ use surface\form\components\Input;
 use surface\form\components\Number;
 use surface\form\components\Select;
 use surface\form\components\Switcher;
-use surface\helper\FormInterface;
+use surface\helper\AbstractForm;
 use iszsw\curd\model\Table as TableModel;
 
-class Form implements FormInterface
+class Form extends AbstractForm
 {
 
     public function options(): array
     {
         return [
-            'resetBtn' => false,
             'async' => [
                 'url' => '',
             ],
@@ -210,7 +209,7 @@ class Form implements FormInterface
         return $column;
     }
 
-    public function save()
+    public function save(): bool
     {
         $post = input();
         try
@@ -224,7 +223,8 @@ class Form implements FormInterface
             Manage::instance()->save(['table' => $table, 'fields' => [$field => $post]]);
         } catch (\Exception $e)
         {
-            return '修改失败';
+            $this->error = $e->getMessage();
+            return false;
         }
 
         return true;

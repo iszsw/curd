@@ -103,8 +103,9 @@ class ResolveField extends Resolve
         }
         $columns = [];
         foreach ($this->table['fields'] as $k => $config) {
-            if ($search && $config['search_type'] === "_") continue;
-            $column = $this->resolveFormColumn($config, $this->data[$config['field']] ?? null, $config[$search ? 'search_type' : 'form_type']);
+            $type = $config[$search ? 'search_type' : 'form_type'];
+            if ( $type === "_" ) continue;
+            $column = $this->resolveFormColumn($config, $this->data[$config['field']] ?? null, $type);
             if (count($column) > 0) {
                 if (count($config["form_format"]) > 0) {
                     $column['value'] = $this->initFormat($config["form_format"], $column['value']);

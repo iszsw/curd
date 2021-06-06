@@ -9,16 +9,15 @@ use surface\form\components\Input;
 use surface\form\components\Radio;
 use surface\form\components\Select;
 use surface\form\components\Switcher;
-use surface\helper\FormInterface;
+use surface\helper\AbstractForm;
 use iszsw\curd\model\Table as TableModel;
 
-class Form implements FormInterface
+class Form extends AbstractForm
 {
 
     public function options(): array
     {
         return [
-            'resetBtn' => false,
             'async' => [
                 'url' => '',
             ],
@@ -30,12 +29,12 @@ class Form implements FormInterface
         $table = input('table', '');
         if ( ! $table)
         {
-            return Helper::error('数据表不存在');
+            throw new \Exception("数据表[{$table}]不存在");
         }
         $model = Manage::instance()->table($table);
         if ( ! $model || count($model) < 1)
         {
-            return Helper::error('参数错误');
+            throw new \Exception("参数错误");
         }
         $buttons = [];
         foreach ($model['button'] as $b) {
@@ -109,7 +108,7 @@ class Form implements FormInterface
         ];
     }
 
-    public function save()
+    public function save():bool
     {
         $post = input();
         try
@@ -117,6 +116,7 @@ class Form implements FormInterface
             Manage::instance()->save($post);
         } catch (\Exception $e)
         {
+            $this->error = $e->getMessage();
             return false;
         }
         return true;

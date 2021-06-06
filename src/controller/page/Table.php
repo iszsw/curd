@@ -3,11 +3,10 @@
 namespace iszsw\curd\controller\page;
 
 use iszsw\curd\lib\ResolveTable;
-use surface\helper\TableInterface;
-use surface\table\components\Header;
-use surface\table\components\Pagination;
+use surface\Component;
+use surface\helper\AbstractTable;
 
-class Table implements TableInterface
+class Table extends AbstractTable
 {
 
     /**
@@ -26,7 +25,7 @@ class Table implements TableInterface
         $this->table = (new ResolveTable($this->tableName));
     }
 
-    public function header(): ?Header
+    public function header(): ?Component
     {
         return $this->table->getHeader();
     }
@@ -41,7 +40,7 @@ class Table implements TableInterface
         return $this->table->getColumn();
     }
 
-    public function pagination(): ?Pagination
+    public function pagination(): ?Component
     {
         return $this->table->getPagination();
     }

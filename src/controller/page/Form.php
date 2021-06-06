@@ -4,9 +4,9 @@ namespace iszsw\curd\controller\page;
 
 use iszsw\curd\lib\Model;
 use iszsw\curd\lib\ResolveField;
-use surface\helper\FormInterface;
+use surface\helper\AbstractForm;
 
-class Form implements FormInterface
+class Form extends AbstractForm
 {
     /**
      * @var ResolveField
@@ -37,14 +37,13 @@ class Form implements FormInterface
         return $this->form->getColumns();
     }
 
-    public function save()
+    public function save(): bool
     {
-        $post    = input();
-        $model   = Model::instance($this->form->table);
-        if (true === $status = $model->save($post)) {
-            return isset($post[$model->getPk()]) && $post[$model->getPk()];
+        if (true !== $error = Model::instance($this->form->table)->save(input())) {
+            $this->error = $error;
+            return false;
         }
-        return false;
+        return true;
     }
 
 

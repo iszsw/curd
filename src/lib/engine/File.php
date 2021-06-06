@@ -188,7 +188,7 @@ class File extends Manage
             fwrite($handle, $string);
             fclose($handle);
         } else {
-            throw new \app\exception\BaseException(__('File {:file} does not have {:type} permission', ['file'=>$file, 'type' => 'write']));
+            throw new \Exception(__('File {:file} does not have {:type} permission', ['file'=>$file, 'type' => 'write']));
         }
 
         return true;

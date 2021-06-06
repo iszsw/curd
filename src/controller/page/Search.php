@@ -4,9 +4,9 @@ namespace iszsw\curd\controller\page;
 
 use iszsw\curd\lib\Model;
 use iszsw\curd\lib\ResolveField;
-use surface\helper\FormInterface;
+use surface\helper\AbstractForm;
 
-class Search implements FormInterface
+class Search extends AbstractForm
 {
     /**
      * @var ResolveField
@@ -32,20 +32,11 @@ class Search implements FormInterface
         $form->search(true);
     }
 
-    public function options(): array
-    {
-        return [];
-    }
-
     public function columns(): array
     {
         return $this->form->getSearchColumns();
     }
 
-    public function save()
-    {
-        return true;
-    }
 
 
 }

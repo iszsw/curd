@@ -2,25 +2,17 @@
 
 namespace iszsw\curd\controller\table;
 
-
 use iszsw\curd\Helper;
 use surface\Component;
 use iszsw\curd\lib\Manage;
-use surface\helper\TableInterface;
+use surface\helper\AbstractTable;
 use surface\table\components\Button;
 use surface\table\components\Column;
 use surface\table\components\Expand;
-use surface\table\components\Header;
-use surface\table\components\Pagination;
 use iszsw\curd\model\Table as TableModel;
 
-class Table implements TableInterface
+class Table extends AbstractTable
 {
-
-    public function header(): ?Header
-    {
-        return null;
-    }
 
     public function options(): array
     {
@@ -54,22 +46,12 @@ class Table implements TableInterface
                     [
                         (new Button('el-icon-edit-outline', '表配置'))->createPage($fieldsUrl, ['table']),
                         (new Button('el-icon-tickets', '字段信息'))->createPage($dataUrl, ['table']),
-                        (new Button('el-icon-collection-tag', '生成菜单'))
-                            ->createConfirm('确认生成菜单？', ['method' => 'post', 'data' => ['table'], 'url' => $menuUrl]),
+                        (new Button('el-icon-collection-tag', '生成链接'))
+                            ->createConfirm('确认生成页面访问链接？', ['method' => 'post', 'data' => ['table'], 'url' => $menuUrl]),
                         (new Button('el-icon-refresh', '初始化表'))
                             ->createConfirm('当前表所有配置将被初始化，确认操作？', ['method' => 'post', 'data' => ['table'], 'url' => $delUrl]),
                     ]
                 ),
         ];
-    }
-
-    public function pagination(): ?Pagination
-    {
-        return null;
-    }
-
-    public function data($where = [], $order = '', $page = 1, $limit = 15): array
-    {
-        return [];
     }
 }

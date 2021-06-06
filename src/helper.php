@@ -85,12 +85,12 @@ class Helper
         return $original;
     }
 
-    public static function success($msg, $data = []){
-        return json(['code' => 0, 'msg'  => $msg, 'data' => $data]);
+    public static function success(string $msg,array $data = []){
+        return ['code' => 0, 'msg'  => $msg, 'data' => $data];
     }
 
-    public static function error($msg, $data){
-        return json(['code' => 1, 'msg'  => $msg, 'data' => $data]);
+    public static function error(string $msg,array $data = []){
+        return ['code' => 1, 'msg'  => $msg, 'data' => $data];
     }
 
 }

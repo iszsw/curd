@@ -5,9 +5,19 @@ namespace iszsw\curd;
 use surface\Factory;
 use think\facade\Route;
 
+/**
+ * 服务
+ *
+ * Author: zsw zswemail@qq.com
+ */
 class Service extends \think\Service
 {
 
+    /**
+     * 注册路由
+     *
+     * 注册CURD全局配置
+     */
     public function register()
     {
         $this->registerRoutes(function (){

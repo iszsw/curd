@@ -11,8 +11,6 @@ use surface\Component;
 use surface\Factory;
 use surface\table\components\Button;
 use surface\table\components\Column;
-use surface\table\components\Header;
-use surface\table\components\Pagination;
 use surface\table\components\Selection;
 use surface\table\Table;
 use surface\table\Type;
@@ -344,11 +342,11 @@ class ResolveTable extends Resolve
         return $btn;
     }
 
-    public function getHeader(): ?Header
+    public function getHeader(): ?Component
     {
         $buttons = $this->getButtons(TableModel::LOCAL_TOP);
 
-        return count($buttons) < 1 ? null : (new Header())->children($buttons);
+        return count($buttons) < 1 ? null : (new Component())->children($buttons);
     }
 
     public function getOptions(): array
@@ -362,9 +360,9 @@ class ResolveTable extends Resolve
         return $this->options;
     }
 
-    public function getPagination(): Pagination
+    public function getPagination(): Component
     {
-        return (new Pagination())->props(
+        return (new Component())->props(
             [
                 'async' => [
                     'url' => Helper::builder_table_url('page', ['_table' => $this->table['table']]),
