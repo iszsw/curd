@@ -47,6 +47,7 @@ abstract class Manage
             'default',          // 默认值
             'search',           // 搜索匹配规则
             'form_type',        // 表单样式
+            'marker',           // 表单提示
             'table_type',       // 表格样式
             'search_type',      // 搜索表单类型
             'search_extend',    // 搜索扩展
@@ -212,6 +213,7 @@ abstract class Manage
                     "table_extend" => [],
 
                     "form_type"   => "input",
+                    "marker"      => '',
                     "form_format" => [],
                     "form_extend" => [],
 

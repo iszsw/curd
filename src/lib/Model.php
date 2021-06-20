@@ -133,8 +133,10 @@ class Model
                         $relation[$k] = $v;
                     } elseif (in_array($k, $fields)) {
                         $post[$k] = $this->saveFormat($field['save_format'], $post[$k], $post);
-                        if (is_array($v)) {
-                            $post[$k] = json_encode($v, JSON_UNESCAPED_UNICODE);
+                        if ($post[$k] === null) {
+                            unset($post[$k]);
+                        } else if (is_array($post[$k])) {
+                            $post[$k] = json_encode($post[$k], JSON_UNESCAPED_UNICODE);
                         }
                         continue;
                     }

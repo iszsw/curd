@@ -60,7 +60,7 @@ class Form extends AbstractForm
                 ->props(['allow-create'=> true, 'filterable' => true, 'multiple' => true, 'default-first-option' => true])
                 ->options(Helper::formatOptions(TableModel::$formatTypes))
                 ->marker(
-                    "表格中显示该字段时会触发 多选会按顺序依次执行<br>1.PHP方法,自定义方法,类静态方法（datetime | user_func | class::method）参数（当前值，当前列） <br>2.内容替换冒号开头"
+                    "表格中显示该字段时会触发 多选会按顺序依次执行<br>1.PHP方法,自定义方法,类静态方法（datetime | user_func | \\namespace\Class::method）参数（当前值，当前列） <br>2.内容替换冒号开头"
                     .htmlspecialchars("(:<b>{data}</b>)")
                 ),
             (new Arrays('table_extend', TableModel::$labels['table_extend'], Helper::formatOptions($data['table_extend'] ?? [], TableModel::VALUE, TableModel::KEY)))->options(
@@ -74,11 +74,12 @@ class Form extends AbstractForm
         $formChildren = [
             (new Select("form_type", TableModel::$labels["form_type"], $data['form_type'] ?? "_"))
                 ->options($formTypes),
+            (new Input("marker", TableModel::$labels['marker'], $data['marker'] ?? ''))->props(['type' => 'textarea'])->marker('支持HTML'),
             (new Select("form_format", TableModel::$labels["form_format"], $data['form_format'] ?? ''))
                 ->props(['allow-create'=> true, 'filterable' => true, 'multiple' => true, 'default-first-option' => true])
                 ->options(Helper::formatOptions(TableModel::$formatTypes))
                 ->marker(
-                    "表单中显示该字段时会触发 多选会按顺序依次执行<br>1.PHP方法,自定义方法,类静态方法（datetime | user_func | class::method）参数（当前值，当前列） <br>2.内容替换冒号开头"
+                    "表单中显示该字段时会触发 多选会按顺序依次执行<br>1.PHP方法,自定义方法,类静态方法（datetime | user_func | \\namespace\Class::method）参数（当前值，当前列） <br>2.内容替换冒号开头"
                     .htmlspecialchars("(:<b>{data}</b>)")
                 ),
             (new Arrays('form_extend', TableModel::$labels['form_extend'], Helper::formatOptions($data['form_extend'] ?? [], TableModel::VALUE, TableModel::KEY)))->options(
@@ -94,7 +95,7 @@ class Form extends AbstractForm
                 ->props(['allow-create'=> true, 'filterable' => true, 'multiple' => true, 'default-first-option' => true])
                 ->options(Helper::formatOptions(TableModel::$formatTypes))
                 ->marker(
-                    "保存该字段时会触发 多选会按顺序依次执行<br>1.PHP方法,自定义方法,类静态方法（datetime | user_func | class::method）参数（当前值，当前列） <br>2.内容替换冒号开头"
+                    "保存该字段时会触发 多选会按顺序依次执行<br>1.PHP方法,自定义方法,类静态方法（datetime | user_func | \\namespace\Class::method）参数（当前值，当前列） <br>2.内容替换冒号开头"
                     .htmlspecialchars("(:<b>{data}</b>)")
                 ),
         ];
@@ -120,7 +121,7 @@ class Form extends AbstractForm
                                            'url' => Helper::builder_table_url('fields/relation', ['table' => $table]),
                                        ],
                                    ]
-                               )->marker((isset($data['option_remote_relation']) ? "当前值：" . implode('/', $data['option_remote_relation']) . " (el-Cascader存在同名问题待解决)<br>" : '') ."中间表 / {$table}主键 / 中间表与{$table}表的关联键 / 中间表与关联表的关联键 / 关联表 / 关联表主键 / 关联表可视字段名"),
+                               )->marker((isset($data['option_remote_relation']) ? "当前值：" . implode('/', $data['option_remote_relation']) . " (el-Cascader组件存在同名问题待解决)<br>" : '') ."中间表 / {$table}主键 / 中间表与{$table}表的关联键 / 中间表与关联表的关联键 / 关联表 / 关联表主键 / 关联表可视字段名"),
                        ]
             );
         } else
@@ -218,7 +219,9 @@ class Form extends AbstractForm
             $field = $post['field'];
             $post['relation'] = !!$post['relation'];
             foreach (['form_extend', 'search_extend', 'table_extend', 'option_config'] as $k) {
-                $post[$k] = Helper::simpleOptions($post[$k]);
+                if (isset($post[$k])) {
+                    $post[$k] = Helper::simpleOptions($post[$k]);
+                }
             }
             Manage::instance()->save(['table' => $table, 'fields' => [$field => $post]]);
         } catch (\Exception $e)

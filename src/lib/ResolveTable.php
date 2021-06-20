@@ -90,7 +90,7 @@ class ResolveTable extends Resolve
             $type = $f['table_type'];
             $prop = $f['field'];
             $label = $f['title'];
-            $props = array_merge($f['table_extend'] ?? [], ["sortable" => $f['table_sort'] ? true : false,]);
+            $props = array_merge(Helper::paramsFormat($f['table_extend'] ?? []), ["sortable" => $f['table_sort'] ? true : false,]);
             $options = [];
 
             switch ($f['table_type'])
@@ -292,7 +292,7 @@ class ResolveTable extends Resolve
 
         foreach ($button as $b)
         {
-            $this->buttons[$b['button_local']][] = $this->generateButton($b)->props('doneRefresh', $b['doneRefresh'] ?? false);
+            $this->buttons[$b['button_local']][] = $this->generateButton($b)->props('doneRefresh', isset($b['doneRefresh']) ? $b['doneRefresh'] : true);
         }
     }
 

@@ -66,7 +66,7 @@ class Table extends AbstractTable
         return [
             (new Column('weight', TableModel::$labels['weight']))->scopedSlots(
                 [
-                    (new Writable())->props(['method' => 'post', 'doneRefresh'=>!0, 'async' => ['url' => $changeUrl, 'data' => ['id']]]),
+                    (new Writable())->props(['method' => 'post', 'doneRefresh'=>!0, 'async' => ['url' => $changeUrl, 'method' => 'post', 'data' => ['id']]]),
                 ]
             )->props('width', '80px'),
             (new Column('field_label', TableModel::$labels['field']))->props(['min-width' => '120px']),

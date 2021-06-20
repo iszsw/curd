@@ -54,7 +54,7 @@ class ResolveField extends Resolve
      */
     protected function resolveFormColumn(array $field, $default = null, $type = 'input'): array
     {
-        return $this->resolveColumnByProps($field['form_extend'], $field, $default, $type);
+        return $this->resolveColumnByProps(Helper::paramsFormat($field['form_extend'] ?? []), $field, $default, $type);
     }
 
     protected function resolveColumnByProps(array $props, array $field, $default, $type = 'input')
@@ -110,7 +110,11 @@ class ResolveField extends Resolve
                 if (count($config["form_format"]) > 0) {
                     $column['value'] = $this->initFormat($config["form_format"], $column['value']);
                 }
-                $columns[] = $this->generateForm($column['type'], $column['field'], $column['title'], $column['value'], $column['props'], $column['options']);
+                $columnModel = $this->generateForm($column['type'], $column['field'], $column['title'], $column['value'], $column['props'], $column['options']);
+                if (isset($config['marker']) && $config['marker']) {
+                    $columnModel->marker($config['marker']);
+                }
+                $columns[] = $columnModel;
             }
         }
         if ($search) {
