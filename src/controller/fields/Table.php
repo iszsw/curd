@@ -7,7 +7,7 @@ use iszsw\curd\Helper;
 use iszsw\curd\lib\Manage;
 use iszsw\curd\model\Table as TableModel;
 use surface\Component;
-use surface\helper\AbstractTable;
+use surface\helper\TableAbstract;
 
 use surface\table\components\Switcher;
 use surface\table\components\Button;
@@ -15,7 +15,7 @@ use surface\table\components\Column;
 use surface\table\components\Select;
 use surface\table\components\Writable;
 
-class Table extends AbstractTable
+class Table extends TableAbstract
 {
 
     private $table;

@@ -5,13 +5,13 @@ namespace iszsw\curd\controller\table;
 use iszsw\curd\Helper;
 use surface\Component;
 use iszsw\curd\lib\Manage;
-use surface\helper\AbstractTable;
+use surface\helper\TableAbstract;
 use surface\table\components\Button;
 use surface\table\components\Column;
 use surface\table\components\Expand;
 use iszsw\curd\model\Table as TableModel;
 
-class Table extends AbstractTable
+class Table extends TableAbstract
 {
 
     public function options(): array

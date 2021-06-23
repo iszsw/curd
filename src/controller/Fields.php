@@ -18,51 +18,54 @@ class Fields extends Common
     public function relation($table, $value)
     {
         $value = array_filter(explode('/', $value));
+        $value = array_map(function ($v) {
+            return explode('.', $v)[0];
+        }, $value);
 
         $data = [];
-        switch (count($value))
+        switch ($count = count($value))
         {
             case 0: // 中间表
                 foreach (Manage::tableNames() as $t)
                 {
                     $data[] = [
                         'label'    => $t['table'],
-                        'value'    => $t['table'],
+                        'value'    => $t['table'] . ".{$count}",
                         'leaf'     => false,
                     ];
                 }
                 break;
             case 1: // 本表外键
-                $data = $this->getRelationFields($table);
+                $data = $this->getRelationFields($table, false, $count);
                 break;
             case 2: // 中间表与本表的关联键
-                $data = $this->getRelationFields($value[0]);
+                $data = $this->getRelationFields($value[0], false, $count);
                 break;
             case 3: // 中间表与关联表的关联键
-                $data = $this->getRelationFields($value[0]);
+                $data = $this->getRelationFields($value[0], false, $count);
                 break;
             case 4: // 关联表
                 foreach (Manage::tableNames() as $t)
                 {
                     $data[] = [
                         'label'    => $t['table'],
-                        'value'    => $t['table'],
+                        'value'    => $t['table'] . ".{$count}",
                         'leaf'     => false,
                     ];
                 }
                 break;
             case 5: // 关联表外键
-                $data = $this->getRelationFields($value[4]);
+                $data = $this->getRelationFields($value[4], false, $count);
                 break;
             case 6: // 关联表可视字段名
-                $data = $this->getRelationFields($value[4], true);
+                $data = $this->getRelationFields($value[4], true, $count);
                 break;
         }
 
         return Helper::success('获取成功', ['list' => $data]);
     }
 
-    private function getRelationFields($table, $leaf = false)
+    private function getRelationFields($table, $leaf = false, $key = '')
     {
         $data = [];
         foreach (Manage::instance()->fields($table) as $v)
@@ -71,7 +74,7 @@ class Fields extends Common
             {
                 $data[] = [
                     'label'    => $v['field'],
-                    'value'    => $v['field'],
+                    'value'    => $v['field'] . ".{$key}",
                     'leaf'     => $leaf,
                 ];
             }

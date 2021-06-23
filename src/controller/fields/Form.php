@@ -13,10 +13,10 @@ use surface\form\components\Input;
 use surface\form\components\Number;
 use surface\form\components\Select;
 use surface\form\components\Switcher;
-use surface\helper\AbstractForm;
+use surface\helper\FormAbstract;
 use iszsw\curd\model\Table as TableModel;
 
-class Form extends AbstractForm
+class Form extends FormAbstract
 {
 
     public function options(): array
@@ -109,19 +109,26 @@ class Form extends AbstractForm
 
         if ($remote_relation_state)
         {
+            $option_remote_relation = $data['option_remote_relation'] ?? [];
+            foreach ($option_remote_relation as $k => &$v) {
+                $v .= ".{$k}";
+            }
+
             array_splice(
                 $column, 4, 0, [
                            (new Hidden('option_type', 'option_remote_relation')),
                            (new Hidden('table_sort', 0)),
                            (new Cascader(
-                               'option_remote_relation', TableModel::$labels["option_remote_relation"], $data['option_remote_relation'] ?? []
-                           ))->props(
+                               'option_remote_relation', TableModel::$labels["option_remote_relation"], $option_remote_relation
+                           ))
+                               ->style('width', '100%')
+                               ->props(
                                    [
                                        'async' => [
                                            'url' => Helper::builder_table_url('fields/relation', ['table' => $table]),
                                        ],
                                    ]
-                               )->marker((isset($data['option_remote_relation']) ? "当前值：" . implode('/', $data['option_remote_relation']) . " (el-Cascader组件存在同名问题待解决)<br>" : '') ."中间表 / {$table}主键 / 中间表与{$table}表的关联键 / 中间表与关联表的关联键 / 关联表 / 关联表主键 / 关联表可视字段名"),
+                               )->marker("中间表 / {$table}主键 / 中间表与{$table}表的关联键 / 中间表与关联表的关联键 / 关联表 / 关联表主键 / 关联表可视字段名"),
                        ]
             );
         } else

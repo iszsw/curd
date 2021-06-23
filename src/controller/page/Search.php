@@ -4,9 +4,9 @@ namespace iszsw\curd\controller\page;
 
 use iszsw\curd\lib\Model;
 use iszsw\curd\lib\ResolveField;
-use surface\helper\AbstractForm;
+use surface\helper\FormAbstract;
 
-class Search extends AbstractForm
+class Search extends FormAbstract
 {
     /**
      * @var ResolveField

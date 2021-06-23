@@ -9,10 +9,10 @@ use surface\form\components\Input;
 use surface\form\components\Radio;
 use surface\form\components\Select;
 use surface\form\components\Switcher;
-use surface\helper\AbstractForm;
+use surface\helper\FormAbstract;
 use iszsw\curd\model\Table as TableModel;
 
-class Form extends AbstractForm
+class Form extends FormAbstract
 {
 
     public function options(): array

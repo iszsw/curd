@@ -4,9 +4,9 @@ namespace iszsw\curd\controller\page;
 
 use iszsw\curd\lib\ResolveTable;
 use surface\Component;
-use surface\helper\AbstractTable;
+use surface\helper\TableAbstract;
 
-class Table extends AbstractTable
+class Table extends TableAbstract
 {
 
     /**

@@ -112,9 +112,14 @@ class File extends Manage
             unset($data['fields']);
         }
 
-        foreach ($fields as $v) {
-            if (isset($v['relation']) && $v['relation'] && count($v['option_remote_relation']) !== 7) {
-                throw new \Exception(Table::$labels['option_remote_relation'] . "不能为空");
+        foreach ($fields as &$v) {
+            if (isset($v['relation']) && $v['relation']) {
+                if (count($v['option_remote_relation']) !== 7) {
+                    throw new \Exception(Table::$labels['option_remote_relation'] . "不能为空");
+                }
+                $v['option_remote_relation'] = array_map(function ($r) {
+                    return explode('.', $r)[0];
+                }, $v['option_remote_relation']);
             }
         }
         foreach ($this->fieldsInfo($table) as $f) {
