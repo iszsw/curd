@@ -19,15 +19,6 @@ use iszsw\curd\model\Table as TableModel;
 class Form extends FormAbstract
 {
 
-    public function options(): array
-    {
-        return [
-            'async' => [
-                'url' => '',
-            ],
-        ];
-    }
-
     public function columns(): array
     {
         $table = input('table', '');

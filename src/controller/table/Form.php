@@ -15,15 +15,6 @@ use iszsw\curd\model\Table as TableModel;
 class Form extends FormAbstract
 {
 
-    public function options(): array
-    {
-        return [
-            'async' => [
-                'url' => '',
-            ],
-        ];
-    }
-
     public function columns(): array
     {
         $table = input('table', '');
@@ -110,10 +101,15 @@ class Form extends FormAbstract
 
     public function save():bool
     {
-        $post = input();
+        $data = input();
         try
         {
-            Manage::instance()->save($post);
+            foreach ($data['button'] as $k => &$b)
+            {
+                $b['btn_extend'] = Helper::simpleOptions($b['btn_extend']);
+                $b['data_extend'] = Helper::simpleOptions($b['data_extend']);
+            }
+            Manage::instance()->save($data);
         } catch (\Exception $e)
         {
             $this->error = $e->getMessage();

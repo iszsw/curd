@@ -155,15 +155,6 @@ class File extends Manage
 
         // 格式化字段
         $data['extend'] = $data['extend'] ? Helper::simpleOptions($data['extend']) : [];
-        if (isset($data['button'])) // 避免修改字段重复更新 data_extend
-        {
-            foreach ($info['button'] as $k => $b)
-            {
-                $b['btn_extend'] = Helper::simpleOptions($b['btn_extend']);
-                $b['data_extend'] = Helper::simpleOptions($b['data_extend']);
-                $info['button'][$k] = $b;
-            }
-        }
 
         return $this->saveData($table, $data);
     }
