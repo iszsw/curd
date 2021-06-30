@@ -1,5 +1,5 @@
 <h1 align="center" style="margin: 30px 0 30px; font-weight: bold;">ThinkPHP-CURD</h1>
-<h4 align="center">后台开发神器，通过可视化配置生成CURD页面</h4>
+<h4 align="center">0代码，后台开发神器，可视化生成CURD页面</h4>
 <p align="center">
     <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="MIT" />
   <a href="https://github.com/iszsw">
