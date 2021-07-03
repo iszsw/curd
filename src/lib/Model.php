@@ -63,8 +63,8 @@ class Model
             {
 
                 /**
-                 *  constructor.
-                 * * @param array $data
+                 * constructor.
+                 * @param array $data
                  *
                  * @param $table
                  *
@@ -81,18 +81,38 @@ class Model
                 }
 
                 // 重写模型的部分方法 开始
+                private function _instanceConfig(self $model): self
+                {
+                    if ($this->connection) {
+                        $model->setConnection($this->connection);
+                    }
+
+                    if ($this->suffix) {
+                        $model->setSuffix($this->suffix);
+                    }
+                    return $model;
+                }
+
                 public function newInstance(array $data = [], $where = null): \think\Model
                 {
                     if (empty($data)) {
-                        return new static();
+                        $model = new static();
+
+                        $this->_instanceConfig($model);
+
+                        return $model;
+                    }else{
+                        $model = (new static($data, $this->table))->exists(true);
+
+                        $this->_instanceConfig($model);
+
+                        $model->setUpdateWhere($where);
+
+                        $model->trigger('AfterRead');
+
+                        return $model;
                     }
 
-                    $model = (new static($data, $this->table))->exists(true);
-                    $model->setUpdateWhere($where);
-
-                    $model->trigger('AfterRead');
-
-                    return $model;
                 }
                 // 重写模型的部分方法 结束
 

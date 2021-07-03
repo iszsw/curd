@@ -122,6 +122,7 @@ class File extends Manage
                 }, $v['option_remote_relation']);
             }
         }
+        unset($v);
         foreach ($this->fieldsInfo($table) as $f) {
             $field = $f['field'];
             if (isset($oldFields[$field])) {

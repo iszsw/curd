@@ -104,6 +104,7 @@ class Form extends FormAbstract
             foreach ($option_remote_relation as $k => &$v) {
                 $v .= ".{$k}";
             }
+            unset($v);
 
             array_splice(
                 $column, 4, 0, [

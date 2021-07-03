@@ -20,6 +20,7 @@ class Table extends TableAbstract
         foreach ($list as &$v) {
             $v['page_label'] = TableModel::$pageLabels[$v['page']] ?? '';
         }
+        unset($v);
         return  [
             'props' => [
                 'data' => $list

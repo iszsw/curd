@@ -109,6 +109,7 @@ class Form extends FormAbstract
                 $b['btn_extend'] = Helper::simpleOptions($b['btn_extend']);
                 $b['data_extend'] = Helper::simpleOptions($b['data_extend']);
             }
+            unset($b);
             Manage::instance()->save($data);
         } catch (\Exception $e)
         {
