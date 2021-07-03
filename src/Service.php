@@ -28,7 +28,6 @@ class Service extends \think\Service
                 Route::rule('index' , $table_namespace . 'index');
                 Route::rule('update'  , $table_namespace . 'update');
                 Route::rule('create', $table_namespace . 'update');
-                Route::rule('menu'  , $table_namespace . 'menu');
                 Route::post('delete', $table_namespace . 'delete');
                 Route::post('change', $table_namespace . 'change');
 
@@ -40,7 +39,6 @@ class Service extends \think\Service
                     Route::rule('create', $page_namespace . 'update');
                     Route::post('delete', $page_namespace . 'delete');
                     Route::post('change', $page_namespace . 'change');
-                    Route::rule('search', $page_namespace . 'search');
                     Route::rule('relation', $page_namespace . 'relation');
                 });
 

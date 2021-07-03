@@ -27,6 +27,22 @@ class Table extends TableAbstract
         ];
     }
 
+    public function header(): ?Component
+    {
+        $url = Helper::builder_table_url('page/index', ['_table' => ''], true);
+        return (new Component(['el' => 'div']))->children(
+            [
+                (new Component())->el('div')->children(
+                    [
+                        (new Component())->el('h2')->children(['数据表']),
+                        (new Component())->el('p')->children(['数据表管理，如果不需要做CURD的表可以不用管理']),
+                        (new Component())->el('p')->domProps('innerHTML', "CURD访问页面：<b>{$url}表名</b>"),
+                    ]
+                ),
+            ]
+        );
+    }
+
     public function columns(): array
     {
         $fieldsUrl = Helper::builder_table_url('update');
@@ -41,13 +57,11 @@ class Table extends TableAbstract
             (new Column('page_label', TableModel::$labels['page']))->props(['width' => '100px']),
             (new Column('rows', TableModel::$labels['rows']))->props(['width' => '100px']),
             (new Column('engine', TableModel::$labels['engine']))->props(['width' => '100px']),
-            (new Column('options', '操作'))->props('fixed', 'right')->props('width', '125px')
+            (new Column('options', '操作'))->props('fixed', 'right')->props('width', '120px')
                 ->scopedSlots(
                     [
                         (new Button('el-icon-edit-outline', '表配置'))->createPage($fieldsUrl, ['table']),
                         (new Button('el-icon-tickets', '字段信息'))->createPage($dataUrl, ['table']),
-                        (new Button('el-icon-collection-tag', '生成链接'))
-                            ->createConfirm('确认生成页面访问链接？', ['method' => 'post', 'data' => ['table'], 'url' => $menuUrl]),
                         (new Button('el-icon-refresh', '初始化表'))
                             ->createConfirm('当前表所有配置将被初始化，确认操作？', ['method' => 'post', 'data' => ['table'], 'url' => $delUrl]),
                     ]

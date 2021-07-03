@@ -119,6 +119,7 @@ class Table
         ];
 
     const BTN_TYPE_PAGE = 'page';
+    const BTN_TYPE_SEARCH = 'search';
     const BTN_TYPE_SUBMIT = 'submit';
     const BTN_TYPE_CONFIRM = 'confirm';
     const BTN_TYPE_REFRESH = 'refresh';

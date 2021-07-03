@@ -4,6 +4,7 @@ namespace iszsw\curd\controller\page;
 
 use iszsw\curd\lib\ResolveTable;
 use surface\Component;
+use surface\helper\FormAbstract;
 use surface\helper\TableAbstract;
 
 class Table extends TableAbstract
@@ -23,6 +24,11 @@ class Table extends TableAbstract
     {
         $this->tableName = $tableName;
         $this->table = (new ResolveTable($this->tableName));
+    }
+
+    public function search(): ?FormAbstract
+    {
+        return new Search($this->tableName);
     }
 
     public function header(): ?Component
@@ -47,6 +53,9 @@ class Table extends TableAbstract
 
     public function data($where = [], $order = '', $page = 1, $limit = 15): array
     {
+        $where = array_filter($where, function ($w) {
+            return !in_array($w[0], ['_table']);
+        });
         return $this->table->getData($where, $order, $page, $limit);
     }
 

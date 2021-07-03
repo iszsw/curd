@@ -92,7 +92,7 @@ class File extends Manage
         // fields 排序
         if (count($fieldInfo) > 1) {
             $sort = array_column($fieldInfo,'weight');
-            array_multisort($sort,SORT_DESC, $fieldInfo);
+            array_multisort($sort,SORT_ASC, $fieldInfo);
         }
 
         return $fieldInfo;
@@ -148,7 +148,7 @@ class File extends Manage
 
         // fields 排序
         $sort = array_column($fields,'weight');
-        array_multisort($sort,SORT_DESC, $fields);
+        array_multisort($sort,SORT_ASC, $fields);
 
         $data = array_merge($info, $data);
         $data['fields'] = $fields;

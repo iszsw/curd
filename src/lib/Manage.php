@@ -229,7 +229,7 @@ abstract class Manage
 
                 if ($list['key'] === 'PRI')
                 { // 主键默认值
-                    $list['weight'] = &$weight;
+                    $list['weight'] = 1;
                     if ($list['auto_increment'])
                     {
                         $list['form_type'] = 'hidden';

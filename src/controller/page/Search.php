@@ -27,9 +27,15 @@ class Search extends FormAbstract
         }
     }
 
-    public function init(\surface\form\Form $form)
+    public function rules(): array
     {
-        $form->search(true);
+        $rules = [];
+        foreach($this->form->fields as $k => $f) {
+            if ($f['search_type'] !== '_') {
+                $rules[$k] = $f['search'];
+            }
+        }
+        return $rules;
     }
 
     public function columns(): array

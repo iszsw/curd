@@ -19,8 +19,6 @@ use iszsw\curd\model\Table as TableModel;
 class ResolveTable extends Resolve
 {
 
-    use Condition;
-
     /**
      * 默认配置
      *
@@ -211,8 +209,7 @@ class ResolveTable extends Resolve
                                    "icon"         => "el-icon-search",
                                    "title"        => TableModel::$labels['search'],
                                    "button_local" => TableModel::LOCAL_TOP,
-                                   "top_type"     => TableModel::BTN_TYPE_PAGE,
-                                   "url"          => Helper::builder_table_url('page/search', ['_table' => $this->table['table']]),
+                                   "top_type"     => TableModel::BTN_TYPE_SEARCH,
                                ]
                     );
                     break;
@@ -323,6 +320,9 @@ class ResolveTable extends Resolve
             case TableModel::BTN_TYPE_REFRESH:
                 $btn->createRefresh();
                 break;
+            case TableModel::BTN_TYPE_SEARCH:
+                $btn->createSearch();
+                break;
             case TableModel::BTN_TYPE_SUBMIT:
                 $btn->createSubmit(
                     [
@@ -373,14 +373,10 @@ class ResolveTable extends Resolve
 
     public function getData($where = [], $order = '', $page = 1, $limit = 15): array
     {
-
-        $condition = [];
-        foreach ($where as $k => $v) {
-            if (!($field = $this->table['fields'][$k] ?? null) || $field['search_type'] === '0') continue;
-            $condition[] = $this->condition($field['search'], $k, $v);
+        $model = Model::instance($this->table['table']);
+        foreach ($where as $w) {
+            $model = call_user_func_array([$model, 'where'], $w);
         }
-
-        $model = Model::instance($this->table['table'])->where($condition);
         $count = $model->count();
         $lists = $model->order($order ?: $this->table['pk'].' DESC')->page($page, $limit)->select()->toArray();
 

@@ -34,11 +34,6 @@ class Page extends Common
         return $this->createTable(new page\Table($this->table));
     }
 
-    public function search()
-    {
-        return $this->createForm(new page\Search($this->table));
-    }
-
     public function update()
     {
         return $this->createForm(new page\Form($this->table));

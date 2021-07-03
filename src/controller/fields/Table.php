@@ -29,6 +29,12 @@ class Table extends TableAbstract
     {
         return (new Component(['el' => 'div']))->children(
             [
+                (new Component())->el('div')->children(
+                    [
+                        (new Component())->el('h2')->children(["表 【{$this->table}】 字段管理"]),
+                        (new Component())->el('p')->children(['修改表中字段在页面中显示的样式']),
+                    ]
+                ),
                 (new Button('el-icon-plus', '添加'))->createPage(Helper::builder_table_url('fields/update', ['table'=>$this->table]))->props('doneRefresh', true),
                 (new Button('el-icon-refresh', '刷新'))->createRefresh()->props('doneRefresh', true),
             ]
@@ -108,7 +114,7 @@ class Table extends TableAbstract
             )->options(),
             (new Column('null', TableModel::$labels['null']))->props('width', '80px'),
             (new Column('default', TableModel::$labels['default']))->props(['width' => '80px', 'show-overflow-tooltip' => true]),
-            (new Column('options', '操作'))->props('fixed', 'right')->props('width', '80px')
+            (new Column('options', '操作'))->props('fixed', 'right')->props('width', '100px')
                 ->scopedSlots(
                     [
                         (new Button('el-icon-edit-outline', '修改'))->createPage($editUrl, ['field'])->props('doneRefresh', true),

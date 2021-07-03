@@ -69,14 +69,9 @@ $ composer require iszsw/curd
 
 - 表
 
-[![cZxRxA.png](https://z3.ax1x.com/2021/04/02/cZxRxA.png)](https://z3.ax1x.com/2021/04/02/cZxRxA.png)
-[![cZx22d.png](https://z3.ax1x.com/2021/04/02/cZx22d.png)](https://z3.ax1x.com/2021/04/02/cZx22d.png)
+[![cZxRxA.png](https://z3.ax1x.com/2021/07/03/RRm3ut.png)](https://z3.ax1x.com/2021/07/03/RRm3ut.png)
 
-- 字段
-
-[![cZxg8H.png](https://z3.ax1x.com/2021/04/02/cZxg8H.png)](https://z3.ax1x.com/2021/04/02/cZxg8H.png)
-[![cZxcPe.png](https://z3.ax1x.com/2021/04/02/cZxcPe.png)](https://z3.ax1x.com/2021/04/02/cZxcPe.png)
 
 - 页面
 
-[![cZxy5D.png](https://z3.ax1x.com/2021/04/02/cZxy5D.png)](https://z3.ax1x.com/2021/04/02/cZxy5D.png)
+[![cZx22d.png](https://z3.ax1x.com/2021/07/03/RRmljI.png)](https://z3.ax1x.com/2021/07/03/RRmljI.png)
