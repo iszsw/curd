@@ -48,10 +48,11 @@ $ composer require iszsw/curd
 
 ## 使用
 
-> 1、连接数据库
+> 1、ThinkPHP框架连接上数据库
 
 > 2、访问 http://域名/curd （路由前缀配置查看config/curd.php配置文件route_prefix）就是这么简单直接
 
+无需其他操作 自动根据数据库字段注释等信息生成页面
 
 ## 说明
 
