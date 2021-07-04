@@ -23,6 +23,13 @@
 - 高自由度，轻松注入自定义逻辑代码
 - 多表关联、一对一、一对多、远程一对多
 
+
+## 演示
+
+[http://curd.demo.zsw.ink/](http://curd.demo.zsw.ink/) 
+
+账号密码 admin  123123
+
 ## 源码地址
 
 gitee地址(主推)：[https://gitee.com/iszsw/curd](https://gitee.com/iszsw/curd)
