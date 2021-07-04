@@ -40,10 +40,6 @@ github地址：[https://github.com/iszsw/curd](https://github.com/iszsw/curd)
 
 [https://www.kancloud.cn/zswok/think-curd](https://www.kancloud.cn/zswok/think-curd)
 
-## 演示
-
-[http://curd.demo.zsw.ink/](http://curd.demo.zsw.ink/)
-
 
 ## 安装
 
