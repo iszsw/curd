@@ -33,16 +33,21 @@ class Form extends FormAbstract
             $b['btn_extend'] = Helper::formatOptions($b['btn_extend'], TableModel::VALUE, TableModel::KEY);
             $buttons[] = $b;
         }
+        $fields = array_keys($model['fields']);
+
+        $fieldsOptions = array_combine($fields, $fields);
+        $defaultDateTime = array_intersect_key($fieldsOptions, TableModel::$defaultDateTime);
 
         return [
             (new Input('table', TableModel::$labels['table'], $model['table']))->props(['readonly' => true]),
-            (new Input('pk', TableModel::$labels['pk'], $model['pk'])),
+            (new Select('pk', TableModel::$labels['pk'], $model['pk']))->options(Helper::formatOptions($fields)),
             (new Input('title', TableModel::$labels['title'], $model['title'])),
             (new Input('description', TableModel::$labels['description'], $model['description'])),
             (new Switcher('page', TableModel::$labels['page'], $model['page'])),
-            (new Switcher('auto_timestamp', TableModel::$labels['auto_timestamp'], $model['auto_timestamp']))
-                ->marker('是否需要自动写入时间戳 自动更新create_time,update_time字段')
-                ->props(['options' => TableModel::$statusLabels]),
+            (new Select('datetime_fields', TableModel::$labels["datetime_fields"], $model['datetime_fields'] ?? array_keys($defaultDateTime)))
+                ->options(Helper::formatOptions($fieldsOptions))
+                ->props(['filterable' => true, 'multiple' => true, 'default-first-option' => true])
+                ->marker('时间字段助手 根据数据库字段类型自动更新时间字段'),
             (new Select('button_default', TableModel::$labels["button_default"], $model['button_default'] ?? array_keys(TableModel::$buttonDefaultLabels)))
                 ->options(Helper::formatOptions(TableModel::$buttonDefaultLabels))
                 ->props(['filterable' => true, 'multiple' => true, 'default-first-option' => true])

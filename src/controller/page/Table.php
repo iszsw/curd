@@ -56,7 +56,7 @@ class Table extends TableAbstract
         $where = array_filter($where, function ($w) {
             return !in_array($w[0], ['_table']);
         });
-        return $this->table->getData($where, $order, $page, $limit);
+        return $this->table->getData(array_values($where), $order, $page, $limit);
     }
 
 

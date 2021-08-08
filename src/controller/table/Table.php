@@ -16,8 +16,10 @@ class Table extends TableAbstract
 
     public function options(): array
     {
-        $list = Manage::instance()->tables();
+        $manage = Manage::instance();
+        $list = $manage->tables();
         foreach ($list as &$v) {
+            $v['table'] = $v['table'];
             $v['page_label'] = TableModel::$pageLabels[$v['page']] ?? '';
         }
         unset($v);
@@ -31,13 +33,14 @@ class Table extends TableAbstract
     public function header(): ?Component
     {
         $url = Helper::builder_table_url('page/index', ['_table' => ''], true);
+        $prefix = Manage::getPrefix();
         return (new Component(['el' => 'div']))->children(
             [
                 (new Component())->el('div')->children(
                     [
-                        (new Component())->el('h2')->children(['数据表']),
-                        (new Component())->el('p')->children(['数据表管理，如果不需要做CURD的表可以不用管理']),
-                        (new Component())->el('p')->domProps('innerHTML', "CURD访问页面：<b>{$url}表名</b>"),
+                        (new Component())->el('h2')->children(['数据表管理']),
+                        (new Component())->el('p')->children(["表前缀【{$prefix}】 "]),
+                        (new Component())->el('p')->domProps('innerHTML', "CURD访问页面：<b>{$url}表名(不带前缀)</b>"),
                     ]
                 ),
             ]
@@ -47,7 +50,6 @@ class Table extends TableAbstract
     public function columns(): array
     {
         $fieldsUrl = Helper::builder_table_url('update');
-        $menuUrl = Helper::builder_table_url('menu');
         $delUrl  = Helper::builder_table_url('delete');
         $dataUrl = Helper::builder_table_url('fields/index');
 

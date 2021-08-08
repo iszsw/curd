@@ -39,8 +39,8 @@ class Form extends FormAbstract
 
     public function save(): bool
     {
-        if (true !== $error = Model::instance($this->form->table)->save(input())) {
-            $this->error = $error;
+        if (!$this->form->save(request()->except(['_table']))) {
+            $this->error = $this->form->getError();
             return false;
         }
         return true;

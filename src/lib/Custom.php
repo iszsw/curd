@@ -18,14 +18,11 @@ class Custom
      * @return false|string
      * Author: zsw zswemail@qq.com
      */
-    public static function datetime($data)
+    public static function toDatetime($data, &$row)
     {
-        if (is_numeric($data)) {
-            $data = date('Y-m-d H:i:s', $data);
-        }
-        return $data;
+        $row['title'] .= "aaa";
+        return self::formatTime($data, 'Y-m-d H:i:s');
     }
-
 
     /**
      * 转日期格式
@@ -36,10 +33,7 @@ class Custom
      */
     public static function toDate($data)
     {
-        if (is_numeric($data)) {
-            $data = date('Y-m-d', $data);
-        }
-        return $data;
+        return self::formatTime($data, 'Y-m-d');
     }
 
     /**
@@ -50,11 +44,9 @@ class Custom
      */
     public static function toTime($data)
     {
-        if (is_numeric($data)) {
-            $data = date('H:i:s', $data);
-        }
-        return $data;
+        return self::formatTime($data, 'H:i:s');
     }
+
 
     /**
      * 转时间戳格式
@@ -62,22 +54,43 @@ class Custom
      * @return false|int
      * Author: zsw zswemail@qq.com
      */
-    public static function timestamp($data)
+    public static function toTimestamp($data)
     {
-        if (is_string($data)) {
-            $data = strtotime($data);
+        return self::formatTime($data, true);
+    }
+
+    /**
+     * 转时间
+     *
+     * @param             $timestamp 日期时间 | 时间戳
+     * @param string|bool $format    日期格式化 | true 转时间戳
+     *
+     * @return string | int
+     */
+    private static function formatTime($timestamp, $format = 'Y-m-d H:i:s')
+    {
+        if (true === $format)
+        {
+            return self::isTimestamp($timestamp) ? $timestamp : (strtotime($timestamp)?:0);
         }
-        return $data;
+
+        return self::isTimestamp($timestamp) ? date($format, $timestamp) : $timestamp;
+    }
+
+    private static function isTimestamp($timestamp): bool
+    {
+        return ctype_digit($timestamp) && strtotime(date('Y-m-d H:i:s', $timestamp)) === (int)$timestamp;
     }
 
     /**
      * 字符串替换
      * @param $data
+     * @param $row
      * @param string $str
      * @return false|int
      * Author: zsw zswemail@qq.com
      */
-    public static function replace($data, $str = '{data}')
+    public static function toReplace($data, $row, $str = '{data}')
     {
         $new = '';
         foreach ((array)$data as $v) {

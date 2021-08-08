@@ -85,8 +85,16 @@ class ResolveTable extends Resolve
                 continue;
             }
 
+            switch ($f['option_type'])
+            {
+                case "option_relation":
+                    $prop = $this->joinName($f['option_relation'][0], $f['option_relation'][2]);
+                    break;
+                default:
+                    $prop = $f['field'];
+            }
+
             $type = $f['table_type'];
-            $prop = $f['field'];
             $label = $f['title'];
             $props = array_merge(Helper::paramsFormat($f['table_extend'] ?? []), ["sortable" => $f['table_sort'] ? true : false,]);
             $options = [];
@@ -94,8 +102,7 @@ class ResolveTable extends Resolve
             switch ($f['table_type'])
             {
                 case 'select':
-                case 'switcher':
-                    $options = $this->options($f[$f['option_type']], $f['option_type']);
+                    $options = $this->options($f[$f['option_type']] ?? '', $f['option_type']);
                     break;
                 default:
             }
@@ -179,6 +186,19 @@ class ResolveTable extends Resolve
             }
             $this->search[] = [$v['search'], $form['type'], $form['field'], $form['title'], $form['value'], ['props' => $form['props']]];
         }
+    }
+
+    /**
+     * 搜索参数配置解析
+     *
+     * @param      $field
+     * @param null $default 默认值
+     *
+     * @return array
+     */
+    private function resolveSearchColumn(array $field, $default = null): array
+    {
+        return $this->resolveColumnByProps(json_decode($field['search_extend'], true) ?? [], $field, $default, $field['search_type']);
     }
 
     /**
@@ -289,7 +309,9 @@ class ResolveTable extends Resolve
 
         foreach ($button as $b)
         {
-            $this->buttons[$b['button_local']][] = $this->generateButton($b)->props('doneRefresh', isset($b['doneRefresh']) ? $b['doneRefresh'] : true);
+            $this->buttons[$b['button_local']][] = $this->generateButton($b)->props(
+                'doneRefresh', isset($b['doneRefresh']) ? $b['doneRefresh'] : true
+            );
         }
     }
 
@@ -373,53 +395,141 @@ class ResolveTable extends Resolve
 
     public function getData($where = [], $order = '', $page = 1, $limit = 15): array
     {
-        $model = Model::instance($this->table['table']);
-        foreach ($where as $w) {
-            $model = call_user_func_array([$model, 'where'], $w);
-        }
+        $model = Model::instance()->name($this->table['table'])->where($where);
         $count = $model->count();
-        $lists = $model->order($order ?: $this->table['pk'].' DESC')->page($page, $limit)->select()->toArray();
+        $fields = [];
+        $relation = [];
+        $remote_relation = [];
+        foreach ($this->table['fields'] as $field => $config)
+        {
+            if ($config['table_type'] === '_')
+            {
+                continue;
+            }
 
-        foreach ($lists as $k => $v)
+            if ($config['relation'])
+            {
+                $remote_relation[] = $field;
+                continue;
+            }
+
+            $fields[] = $field;
+
+            if ($config['option_type'] === 'option_relation')
+            {
+                $relation[] = $field;
+            }
+        }
+
+        if (false === array_search($this->table['pk'], $fields))
+        {
+            $fields[] = $this->table['pk'];
+        }
+
+        $lists = $model->field($fields)->order($order ?: $this->table['pk'].' DESC')->page($page, $limit)->select()->toArray();
+        $lists = array_combine(array_column($lists, $this->table['pk']), $lists);
+
+        $relationData = [];
+        if (count($relation))
+        {
+            foreach ($relation as $f)
+            {
+                $fieldInfo = $this->table['fields'][$f];
+                [$join_table, $join_pk, $join_title] = $fieldInfo['option_relation'];
+
+                $relation_pks = array_values(array_unique(array_filter(array_column($lists, $f))));
+
+                $relationData[$f] = Model::instance()->name($join_table)->whereIn($join_pk, $relation_pks)->column($join_title, $join_pk);
+            }
+        }
+        unset($relation);
+
+        if (count($remote_relation))
+        {
+            foreach ($remote_relation as $f)
+            {
+                $fieldInfo = $this->table['fields'][$f];
+
+                $_orr = $fieldInfo['option_remote_relation'];
+
+                $relation_pks = array_values(array_filter(array_column($lists, $_orr[1])));
+
+                $relationData[$f] = Model::instance()->name($_orr[0])->alias($_orr[0])
+                    ->field("{$_orr[4]}.*, {$_orr[0]}.{$_orr[2]} as {$this->joinName($_orr[0], $_orr[2])}, {$_orr[0]}.{$_orr[3]} as {$this->joinName($_orr[0], $_orr[3])}")
+                    ->leftJoin("{$_orr[4]} {$_orr[4]}", "{$_orr[0]}.{$_orr[3]} = {$_orr[4]}.{$_orr[5]}")
+                    ->whereIn("{$_orr[0]}.{$_orr[2]}", $relation_pks)
+                    ->select()
+                    ->toArray();
+
+            }
+        }
+        unset($remote_relation);
+
+        foreach ($lists as $k => &$list)
         {
             foreach ($this->table['fields'] as $field => $config)
             {
-                if ( ! $config['table_type'])
+                if ($config['table_type'] === '_')
                 {
                     continue;
                 }
 
-                $value = $v[$field] ?? '';
+                $value = $list[$field] ?? '';
 
-                if ($config["option_type"])
+                switch ($config["option_type"])
                 {
-                    $row_pk = 0;
-                    if ($config['relation'])
-                    {
-                        $relation = $config['option_remote_relation'];
-                        $row_pk = $v[$relation[1]];
-                    }
-                    $value = $this->initFieldVal(
-                        $value, $config['table_type'], $config["option_type"], $config[$config['option_type']] ?? '', $row_pk
-                    );
+                    case 'option_remote_relation':
+                        $_orr = $config['option_remote_relation'];
+                        $_key = $this->joinName($_orr[0], $_orr[2]);
+                        $_pk = $list[$_orr[1]];
+                        $allow = array_filter(
+                            $relationData[$field], function ($v) use ($_key, $_pk)
+                        {
+                            return $v[$_key] === $_pk;
+                        }
+                        );
+                        $value = array_values(array_column($allow, $_orr[6]));
+                        break;
+                    case 'option_relation':
+                        $fieldInfo = $this->table['fields'][$field];
+                        [$join_table, $join_pk, $join_title] = $fieldInfo['option_relation'];
+                        $list[$this->joinName($join_table, $join_title)] = $relationData[$field][$list[$field]] ?? '';
+                        break;
+                    case 'option_config':
+                        $value = $config[$config['option_type']][$value] ?? '';
+                        break;
+                    case 'option_lang':
+                        $optionConfig = $config[$config['option_type']];
+                        $option = lang('?'.$optionConfig) ? lang($optionConfig) : '';
+                        $value = is_array($option) ? $option[$value] : $option;
+                        break;
                 }
 
                 if ($config["table_format"] ?? false)
                 {
-                    $value = $this->initFormat($config["table_format"], $value, $v);
+                    $value = $this->invoke($config["table_format"], $value, $list);
                 }
 
-                if (is_array($value)) {
-                    $value = implode(',', $value);
-                }
-
-                $lists[$k][$field] = $value;
+                $list[$field] = $this->toString($value);
             }
+
         }
+        unset($list);
 
         return [
             'count' => $count,
-            'list'  => $lists,
+            'list'  => array_values($lists),
         ];
     }
+
+    private function toString($data)
+    {
+        return is_array($data) ? json_encode($data, JSON_UNESCAPED_UNICODE) : (string)$data;
+    }
+
+    private function joinName($table, $title)
+    {
+        return "{$table}__{$title}";
+    }
+
 }

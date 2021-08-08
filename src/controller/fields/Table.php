@@ -48,7 +48,7 @@ class Table extends TableAbstract
         foreach ($list as &$v)
         {
             $v['id'] = $v['field'];
-            $v['field_label'] = $v['field'].((isset($v['key']) && $v['key']) ? "【{$v['key']}】" : '') . ($v['relation'] ? '【增】' : '');
+            (isset($v['field_label']) && $v['field_label']) || $v['field_label'] = $v['field'].((isset($v['key']) && $v['key']) ? "【{$v['key']}】" : '') . ($v['relation'] ? '【增】' : '');
             $v['search'] =  $formTypes[$v['search_type']] . ($v['search_type'] !== '_' ? "  【{$v['search']}】 " : '');
         }
         unset($v);
@@ -81,16 +81,7 @@ class Table extends TableAbstract
                     (new Writable())->props(['async' => ['url' => $changeUrl, 'method' => 'post', 'data'=>['id']]]),
                 ]
             ),
-            (new Column('form_type', TableModel::$labels['form_type']))->props('width', '120px')->scopedSlots(
-                [
-                    (new Select())->props(
-                        [
-                            'async'   => ['method' => 'post', 'data' => ['id'], 'url' => $changeUrl],
-                            'options' => $formTypes,
-                        ]
-                    )->options(),
-                ]
-            ),
+            (new Column('type', TableModel::$labels['type']))->props(['min-width' => '150px']),
             (new Column('table_type', TableModel::$labels['table_type']))->props('width', '120px')->scopedSlots(
                 [
                     (new Select())->props(
@@ -99,6 +90,16 @@ class Table extends TableAbstract
                             'options' => $tableTypes,
                         ]
                     ),
+                ]
+            ),
+            (new Column('form_type', TableModel::$labels['form_type']))->props('width', '120px')->scopedSlots(
+                [
+                    (new Select())->props(
+                        [
+                            'async'   => ['method' => 'post', 'data' => ['id'], 'url' => $changeUrl],
+                            'options' => $formTypes,
+                        ]
+                    )->options(),
                 ]
             ),
             (new Column('search', TableModel::$labels['search']))->props('min-width', '120px'),

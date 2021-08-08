@@ -20,15 +20,8 @@
 - SQL注入过滤
 - 自定义按钮,样式
 - 自动生成前端访问页面
+- 多表关联、一对一、一对多
 - 高自由度，轻松注入自定义逻辑代码
-- 多表关联、一对一、一对多、远程一对多
-
-
-## 演示
-
-[http://curd.demo.zsw.ink/](http://curd.demo.zsw.ink/) 
-
-账号密码 admin  123123
 
 ## 源码地址
 
@@ -38,10 +31,14 @@ github地址：[https://github.com/iszsw/curd](https://github.com/iszsw/curd)
 
 ## 文档
 
-[https://www.kancloud.cn/zswok/think-curd](https://www.kancloud.cn/zswok/think-curd)
+[https://www.kancloud.cn/zswok/think-curd【完善中...】](https://www.kancloud.cn/zswok/think-curd)
+
+## 演示
+
+[http://curd.demo.zsw.ink/](http://curd.demo.zsw.ink/)
 
 
-## 安装
+## 安装和使用
 
 > 运行环境要求PHP7.1+。
 
@@ -49,13 +46,10 @@ github地址：[https://github.com/iszsw/curd](https://github.com/iszsw/curd)
 $ composer require iszsw/curd
 ```
 
-## 使用
-
-> 1、ThinkPHP框架连接上数据库
+> 1、框架中配置数据库
 
 > 2、访问 http://域名/curd （路由前缀配置查看config/curd.php配置文件route_prefix）就是这么简单直接
 
-无需其他操作 自动根据数据库字段注释等信息生成页面
 
 ## 说明
 

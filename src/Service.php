@@ -2,6 +2,8 @@
 
 namespace iszsw\curd;
 
+use iszsw\curd\lib\Model;
+use plugin\api\logic\ApiLogic;
 use surface\Factory;
 use think\facade\Route;
 
@@ -56,8 +58,11 @@ class Service extends \think\Service
             });
         });
 
-        Factory::configure(config('curd.surface'));
     }
 
+    public function boot()
+    {
+        Factory::configure(config('curd.surface'));
+    }
 
 }

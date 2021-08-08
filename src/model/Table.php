@@ -63,7 +63,7 @@ class Table
             'custom'        => '自定义',
             'matching'      => '匹配规划',
 
-            'auto_timestamp'         => '自动写入时间',
+            'datetime_fields'        => '日期时间字段',
             'option_type'            => '值选项',
             'middle_table'           => '中间表',
             'remote_table'           => '远程表',
@@ -96,6 +96,12 @@ class Table
             self::BUTTON_DELETE => '删除',
             self::BUTTON_REFRESH => '刷新',
         ];
+
+    public static $defaultDateTime = [
+        'create_time'=>'create_time',
+        'update_time'=>'update_time',
+        'delete_time'=>'delete_time'
+    ];
 
     public static $showLabels
         = [
@@ -134,10 +140,10 @@ class Table
 
     public static $formatTypes
         = [
-            'datetime'  => '日期时间 Y-m-d H:i:s',
-            'toDate'    => '日期 Y-m-d',
-            'toTime'    => '时间 H:i:s',
-            'timestamp' => '时间戳',
+            'toDatetime'  => '日期时间 Y-m-d H:i:s',
+            'toDate'      => '日期 Y-m-d',
+            'toTime'      => '时间 H:i:s',
+            'toTimestamp' => '时间戳',
         ];
 
     public static $searchType

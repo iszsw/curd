@@ -6,10 +6,14 @@
 
 namespace iszsw\curd\lib;
 
+use iszsw\curd\model\Table;
 use surface\table\Type;
+use think\exception\HttpException;
 
 abstract class Resolve
 {
+
+    protected $error;
 
     /**
      * @var table文件配置
@@ -21,8 +25,13 @@ abstract class Resolve
         $this->table = Manage::instance()->table($table);
         if ( ! $this->table)
         {
-            throw new \Exception("表【{$table}】不存在");
+            throw new HttpException(404, "表【{$table}】不存在");
         }
+    }
+
+    public function getError()
+    {
+        return $this->error;
     }
 
     /**
@@ -30,138 +39,86 @@ abstract class Resolve
      *
      * @param       $val
      * @param       $type
-     * @param array $values
+     * @param array $in
      *
      * @return array
      */
-    protected function options($val, $type, array $values = []): array
+    protected function options($val, $type, array $in = []): array
     {
         $option = [];
         switch ($type)
         {
             case 'option_remote_relation':
-                if (count($val) === 7)
-                {
-                    $option = Model::instance($val[4])->where(count($values) > 0 ? [[$val[5], 'in', $values]] : [])->limit(100)->column($val[6], $val[5]);
-                }
+                $option = Model::instance()->name($val[4])->where(count($in) > 0 ? [[$val[5], 'in', $in]] : [])->limit(100)->column($val[6], $val[5]);
                 break;
             case 'option_relation':
-                if (count($val) === 3)
-                {
-                    $option = Model::instance($val[0])->where(count($values) > 0 ? [[$val[1], 'in', $values]] : [])->limit(100)->column($val[2], $val[1]);
-                }
+                $option = Model::instance()->name($val[0])->where(count($in) > 0 ? [[$val[1], 'in', $in]] : [])->limit(100)->column($val[2], $val[1]);
                 break;
             case 'option_config':
                 $option = $val;
                 break;
             case 'option_lang':
+                $option = lang('?'.$val) ? lang($val) : [];
+                break;
             default:
-                $option = __('?'.$val) ? __($val) : [];
         }
 
-        return $option;
+        return $option + array_combine($in, $in);
     }
 
     /**
-     * 初始化字段数据
+     * 初始化方法解析
      *
-     * @param $val              值
-     * @param $table_type       表格类型  text text_edit ....
-     * @param $option_type      字段配置类型 option_default option_config...
-     * @param $option_config    字段配置参数
-     * @param $pk               string        当前列主键值
+     * Form 页面中不支持直接修改$row
      *
-     * @return string
-     * Author: zsw zswemail@qq.com
+     * @param      $methods
+     * @param      $val
+     * @param null $row        当前列 地址传递
+     *
+     * @return mixed
+     * @throws \Exception
      */
-    protected function initFieldVal($val, $table_type, $option_type, $option_config, $pk = '')
+    protected function invoke($methods, $val, &$row = null)
     {
-        $allow = ['column', 'expand'];
-        if (in_array($table_type, $allow))
-        {
-            switch ($option_type)
+        is_array($methods) || $methods = (array)$methods;
+        foreach ($methods as $func) {
+            $params = [];
+
+            $func = trim($func);
+            if (strpos($func, '::')) {
+                $func = explode('::', $func, 2);
+            } elseif (strpos($func, ':') === 0) {
+                $params[] = ltrim($func, ':');
+                $func = [Custom::class, 'toReplace'];
+            } elseif (isset(Table::$formatTypes[$func])) {
+                $func = [Custom::class, $func];
+            }
+
+            if (is_array($func) && count($func) === 2)
             {
-                case 'option_remote_relation':
-                    $val = Model::instance($option_config[4])
-                        ->where(
-                            $option_config[5], 'IN', function ($query) use ($option_config, $pk)
-                        {
-                            $query->table($option_config[0])->where($option_config[2], $pk)->field($option_config[3]);
-                        }
-                        )
-                        ->column($option_config[6], $option_config[5]);
-                    break;
-                case 'option_relation':
-                    if (count($option_config) === 3)
-                    {
-                        $val = Model::instance($option_config[0])->where([$option_config[1] => $val])->value($option_config[2]);
+                try {
+                    $reflect = new \ReflectionClass($func[0]);
+                } catch (\Exception $e) {
+                    throw new \Exception('class not exists: ' . $func[0]);
+                }
+                if ($reflect->hasMethod($func[1])) {
+                    $method = $reflect->getMethod($func[1]);
+                    if ($method->isStatic()) {
+                        $method = $func[1];
+                        $val = $func[0]::$method($val, $row, ...$params);
+                    }elseif ($method->isPublic()) {
+                        $val = (new $func[0]())->$func[1]($val, $row, ...$params);
                     }
-                    break;
-                case 'option_config':
-                    $val = $option_config[$val];
-                    break;
-                case 'option_lang':
-                    $option = __('?'.$option_config) ? __($option_config) : '';
-                    $val = $option[$val];
+                }else{
+                    throw new \Exception('method not exists: ' . $func[1]);
+                }
+            } elseif (is_string($func) && function_exists($func))
+            {
+                $val = $func($val, $row, ...$params);
             }
         }
 
         return $val;
-    }
-
-    /**
-     * 搜索参数配置解析
-     *
-     * @param      $field
-     * @param null $default 默认值
-     *
-     * @return array
-     */
-    protected function resolveSearchColumn(array $field, $default = null): array
-    {
-        return $this->resolveColumnByProps(json_decode($field['search_extend'], true) ?? [], $field, $default, $field['search_type']);
-    }
-
-    /**
-     * 默认值解析
-     *
-     * @param        $field
-     * @param string $default 默认值
-     * @param array  $data    默认值
-     *
-     * @return array
-     */
-    protected function resolveFormDefault(array $field, $default = '', $data = [])
-    {
-        if ($field['relation'])
-        { // 扩展字段
-            $remote_relation = $field['option_remote_relation'];
-            $default = Model::instance($remote_relation[0])->where($remote_relation[2], $data[$remote_relation[1]])->column($remote_relation[3]);
-            $default = array_values($default);
-        } else
-        {
-            switch ($field['form_type'])
-            {
-                case 'cascader':
-                case 'select':
-                case 'selects':
-                case 'radio':
-                case 'checkbox':
-                case 'switcher':
-                case 'upload':
-                case 'take':
-                    $default = json_decode($default, true) ?? $default;
-                    break;
-                default:
-            }
-        }
-
-        return $default;
-    }
-
-    protected function initFormat($methods, $val, ...$args)
-    {
-        return Format::parse($methods, $val, $args);
     }
 
     public function __get($name)

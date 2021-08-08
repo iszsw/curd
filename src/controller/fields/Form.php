@@ -19,11 +19,13 @@ use iszsw\curd\model\Table as TableModel;
 class Form extends FormAbstract
 {
 
+    const CASCADER_SEPARATOR = '.';
+
     public function columns(): array
     {
         $table = input('table', '');
         $field = input('field', '');
-        $create = !$field;
+        $create = ! $field;
         $data = $create ? [] : Manage::instance()->field($table, $field);
         $formTypes = Helper::formatOptions(TableModel::getFormServersLabels());
         $tableTypes = Helper::formatOptions(TableModel::getTableServersLabels());
@@ -33,28 +35,40 @@ class Form extends FormAbstract
 
         $searchChildren = [
             (new Select("search_type", TableModel::$labels["search_type"], $data['search_type'] ?? "_"))->options($formTypes),
+
             (new Select("search", TableModel::$labels["matching"], $data['search'] ?? '='))
                 ->options(Helper::formatOptions(TableModel::$searchType))
-                ->visible([['exec' => 'model.search_type !== "0"']]),
-            (new Arrays('search_extend', TableModel::$labels['search_extend'], Helper::formatOptions($data['search_extend'] ?? [], TableModel::VALUE, TableModel::KEY)))->options(
+                ->visible([['exec' => 'model.search_type !== "_"']]),
+
+            (new Arrays(
+                'search_extend', TableModel::$labels['search_extend'], Helper::formatOptions(
+                $data['search_extend'] ?? [], TableModel::VALUE, TableModel::KEY
+            )
+            ))->options(
                 [
                     (new Input(TableModel::KEY, TableModel::$labels[TableModel::KEY]))->item(false),
                     (new Input(TableModel::VALUE, TableModel::$labels[TableModel::VALUE]))->item(false),
                 ]
-            )->marker('表单扩展props配置'),
+            )
+                ->visible([['exec' => 'model.search_type !== "_"']])
+                ->marker('表单扩展props配置'),
         ];
 
         $tableChildren = [
             (new Select("table_type", TableModel::$labels["table_type"], $data['table_type'] ?? "_"))
                 ->options($tableTypes),
             (new Select("table_format", TableModel::$labels["table_format"], $data['table_format'] ?? ''))
-                ->props(['allow-create'=> true, 'filterable' => true, 'multiple' => true, 'default-first-option' => true])
+                ->props(['allow-create' => true, 'filterable' => true, 'multiple' => true, 'default-first-option' => true])
                 ->options(Helper::formatOptions(TableModel::$formatTypes))
                 ->marker(
-                    "表格中显示该字段时会触发 多选会按顺序依次执行<br>1.PHP方法,自定义方法,类静态方法（datetime | user_func | \\namespace\Class::method）参数（当前值，当前列） <br>2.内容替换冒号开头"
+                    "表格中显示该字段时会触发 多选会按顺序依次执行<br>1.公共方法,类静态方法（ func | \\namespace\Class::method ）参数（当前值，&当前列）：value <br>2.内容替换冒号开头"
                     .htmlspecialchars("(:<b>{data}</b>)")
                 ),
-            (new Arrays('table_extend', TableModel::$labels['table_extend'], Helper::formatOptions($data['table_extend'] ?? [], TableModel::VALUE, TableModel::KEY)))->options(
+            (new Arrays(
+                'table_extend', TableModel::$labels['table_extend'], Helper::formatOptions(
+                $data['table_extend'] ?? [], TableModel::VALUE, TableModel::KEY
+            )
+            ))->options(
                 [
                     (new Input(TableModel::KEY, TableModel::$labels[TableModel::KEY]))->item(false),
                     (new Input(TableModel::VALUE, TableModel::$labels[TableModel::VALUE]))->item(false),
@@ -67,26 +81,30 @@ class Form extends FormAbstract
                 ->options($formTypes),
             (new Input("marker", TableModel::$labels['marker'], $data['marker'] ?? ''))->props(['type' => 'textarea'])->marker('支持HTML'),
             (new Select("form_format", TableModel::$labels["form_format"], $data['form_format'] ?? ''))
-                ->props(['allow-create'=> true, 'filterable' => true, 'multiple' => true, 'default-first-option' => true])
+                ->props(['allow-create' => true, 'filterable' => true, 'multiple' => true, 'default-first-option' => true])
                 ->options(Helper::formatOptions(TableModel::$formatTypes))
                 ->marker(
-                    "表单中显示该字段时会触发 多选会按顺序依次执行<br>1.PHP方法,自定义方法,类静态方法（datetime | user_func | \\namespace\Class::method）参数（当前值，当前列） <br>2.内容替换冒号开头"
+                    "表单中显示该字段时会触发 多选会按顺序依次执行<br>1.公共方法,类静态方法（ func | \\namespace\Class::method ）参数（当前值，当前列）：value <br>2.内容替换冒号开头"
                     .htmlspecialchars("(:<b>{data}</b>)")
                 ),
-            (new Arrays('form_extend', TableModel::$labels['form_extend'], Helper::formatOptions($data['form_extend'] ?? [], TableModel::VALUE, TableModel::KEY)))->options(
+            (new Arrays(
+                'form_extend', TableModel::$labels['form_extend'], Helper::formatOptions(
+                $data['form_extend'] ?? [], TableModel::VALUE, TableModel::KEY
+            )
+            ))->options(
                 [
                     (new Input(TableModel::KEY, TableModel::$labels[TableModel::KEY]))->item(false),
                     (new Input(TableModel::VALUE, TableModel::$labels[TableModel::VALUE]))->item(false),
                 ]
-            )->marker('表单扩展props配置')
+            )->marker('表单扩展props配置'),
         ];
 
         $saveChildren = [
             (new Select("save_format", TableModel::$labels["save_format"], $data['save_format'] ?? ""))
-                ->props(['allow-create'=> true, 'filterable' => true, 'multiple' => true, 'default-first-option' => true])
+                ->props(['allow-create' => true, 'filterable' => true, 'multiple' => true, 'default-first-option' => true])
                 ->options(Helper::formatOptions(TableModel::$formatTypes))
                 ->marker(
-                    "保存该字段时会触发 多选会按顺序依次执行<br>1.PHP方法,自定义方法,类静态方法（datetime | user_func | \\namespace\Class::method）参数（当前值，当前列） <br>2.内容替换冒号开头"
+                    "保存该字段时会触发 多选会按顺序依次执行<br>2.公共方法,类静态方法（ func | \\namespace\Class::method ）参数（当前值，当前列）：value | null(禁止修改)  <br>2.内容替换冒号开头"
                     .htmlspecialchars("(:<b>{data}</b>)")
                 ),
         ];
@@ -101,7 +119,8 @@ class Form extends FormAbstract
         if ($remote_relation_state)
         {
             $option_remote_relation = $data['option_remote_relation'] ?? [];
-            foreach ($option_remote_relation as $k => &$v) {
+            foreach ($option_remote_relation as $k => &$v)
+            {
                 $v .= ".{$k}";
             }
             unset($v);
@@ -130,7 +149,7 @@ class Form extends FormAbstract
             $tableNames = Manage::tableNames();
             foreach ($tableNames as $t)
             {
-                $fields = Manage::instance()->fields($t['table']);
+                $fields = Manage::instance()->fields($t);
                 $children = [];
                 foreach ($fields as $f)
                 {
@@ -138,13 +157,13 @@ class Form extends FormAbstract
                         'label' => $f['field'],
                         'value' => $f['field'],
                     ];
-                    $childrenList[$t['table']][] = $childrenData;
-                    $children[] = array_merge($childrenData, ['children' => &$childrenList[$t['table']]]);
+                    $childrenList[$t][] = $childrenData;
+                    $children[] = array_merge($childrenData, ['children' => &$childrenList[$t]]);
                 }
 
                 $relation_tables[] = [
-                    'label'    => $t['table'],
-                    'value'    => $t['table'],
+                    'label'    => $t,
+                    'value'    => $t,
                     'children' => $children,
                 ];
             }
@@ -152,7 +171,9 @@ class Form extends FormAbstract
             array_splice(
                 $tableChildren, 2, 0,
                 [
-                    (new Switcher("table_sort", TableModel::$labels["table_sort"], $data['table_sort'] ?? 0))->options(Helper::formatOptions(TableModel::$statusLabels))
+                    (new Switcher(
+                        "table_sort", TableModel::$labels["table_sort"], $data['table_sort'] ?? 0
+                    ))->options(Helper::formatOptions(TableModel::$statusLabels))
                         ->marker("启用之后可以在表格中使用该字段排序"),
                 ]
             );
@@ -163,15 +184,23 @@ class Form extends FormAbstract
                     new Input('default', TableModel::$labels['default'], $data['default'] ?? ""),
 
                     (new Select('option_type', TableModel::$labels["option_type"], $data['option_type'] ?? "option_default"))
-                        ->options(Helper::formatOptions([
-                                      'option_default' => TableModel::$labels["option_default"],
-                                      'option_config' => TableModel::$labels["option_config"],
-                                      'option_lang' => TableModel::$labels["option_lang"],
-                                      'option_relation' => TableModel::$labels["option_relation"],
-                                  ]))->marker('非‘默认’时 将读取相应配置 作为select radio等选项'),
+                        ->options(
+                            Helper::formatOptions(
+                                [
+                                    'option_default'  => TableModel::$labels["option_default"],
+                                    'option_config'   => TableModel::$labels["option_config"],
+                                    'option_lang'     => TableModel::$labels["option_lang"],
+                                    'option_relation' => TableModel::$labels["option_relation"],
+                                ]
+                            )
+                        )->marker('非‘默认’时 将读取相应配置 作为select radio等选项'),
 
                     (new Hidden('option_default', 1))->visible([['prop' => 'option_type', 'value' => 'option_default']]),
-                    (new Arrays('option_config', TableModel::$labels['option_config'], Helper::formatOptions($data['option_config'] ?? [], TableModel::VALUE, TableModel::KEY)))->options(
+                    (new Arrays(
+                        'option_config', TableModel::$labels['option_config'], Helper::formatOptions(
+                        $data['option_config'] ?? [], TableModel::VALUE, TableModel::KEY
+                    )
+                    ))->options(
                         [
                             (new Input(TableModel::KEY, TableModel::$labels[TableModel::KEY]))->item(false),
                             (new Input(TableModel::VALUE, TableModel::$labels[TableModel::VALUE]))->item(false),
@@ -188,23 +217,25 @@ class Form extends FormAbstract
             );
         }
 
-        array_push($column, (new Column('', TableModel::$labels['custom']))->el('el-tabs')
+        array_push(
+            $column, (new Column('', TableModel::$labels['custom']))->el('el-tabs')
             ->children(
-            [
-                (new Component())->el('el-tab-pane')->item(false)
-                    ->props('label', TableModel::$labels["search"])
-                    ->children($searchChildren),
-                (new Component())->el('el-tab-pane')->item(false)
-                    ->props('label', TableModel::$labels["surface_table"])
-                    ->children($tableChildren),
-                (new Component())->el('el-tab-pane')->item(false)
-                    ->props('label', TableModel::$labels["form"])
-                    ->children($formChildren),
-                (new Component())->el('el-tab-pane')->item(false)
-                    ->props('label', TableModel::$labels["save"])
-                    ->children($saveChildren),
-            ]
-        ));
+                [
+                    (new Component())->el('el-tab-pane')->item(false)
+                        ->props('label', TableModel::$labels["search"])
+                        ->children($searchChildren),
+                    (new Component())->el('el-tab-pane')->item(false)
+                        ->props('label', TableModel::$labels["surface_table"])
+                        ->children($tableChildren),
+                    (new Component())->el('el-tab-pane')->item(false)
+                        ->props('label', TableModel::$labels["form"])
+                        ->children($formChildren),
+                    (new Component())->el('el-tab-pane')->item(false)
+                        ->props('label', TableModel::$labels["save"])
+                        ->children($saveChildren),
+                ]
+            )
+        );
 
         return $column;
     }
@@ -216,16 +247,32 @@ class Form extends FormAbstract
         {
             $table = $post['table'];
             $field = $post['field'];
-            $post['relation'] = !!$post['relation'];
-            foreach (['form_extend', 'search_extend', 'table_extend', 'option_config'] as $k) {
-                if (isset($post[$k])) {
+            $post['relation'] = ! ! $post['relation'];
+            foreach (['form_extend', 'search_extend', 'table_extend', 'option_config'] as $k)
+            {
+                if (isset($post[$k]))
+                {
                     $post[$k] = Helper::simpleOptions($post[$k]);
                 }
             }
+
+            // 解决 Element Cascader 组件value唯一问题
+            if (isset($post['option_remote_relation']))
+            {
+                $separator = self::CASCADER_SEPARATOR;
+                $post['option_remote_relation'] = array_map(
+                    function ($r) use ($separator)
+                    {
+                        return explode($separator, $r)[0];
+                    }, $post['option_remote_relation']
+                );
+            }
+
             Manage::instance()->save(['table' => $table, 'fields' => [$field => $post]]);
         } catch (\Exception $e)
         {
             $this->error = $e->getMessage();
+
             return false;
         }
 

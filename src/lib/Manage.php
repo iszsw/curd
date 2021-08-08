@@ -12,17 +12,29 @@ use iszsw\curd\model\Table as TableMode;
 
 abstract class Manage
 {
+    /**
+     * 表前缀
+     *
+     * @var string
+     */
+    protected static $prefix = '';
 
     const FILE_NAME = 'file';
 
-    public static $engine = [
-        self::FILE_NAME => File::class
-    ];
+    public static $engine
+        = [
+            self::FILE_NAME => File::class,
+        ];
 
     /**
      * 数据库名字位置
      */
-    const TABLE_NAME_CONFIG = 'connections.mysql.database';
+    const DATABASE_CONFIG_LOCATION = 'connections.mysql.database';
+
+    /**
+     * 数据表前缀位置
+     */
+    const PREFIX_CONFIG_LOCATION = 'connections.mysql.prefix';
 
     protected $tableContent
         = [
@@ -30,7 +42,7 @@ abstract class Manage
             'pk',               // 索引
             'title',            // 标题
             'description',      // 描述
-            'auto_timestamp',   // 自动时间戳
+            'datetime_fields',   // 自动时间戳
             'button_default',   // 默认按钮
             'page',             // 分页
             'button',           // 按钮
@@ -76,19 +88,25 @@ abstract class Manage
         $this->config = $config;
     }
 
+    private static $instance = null;
+
     /**
-     * @param string $engine
+     * @param bool $refresh
      *
-     * @return self
+     * @return static
      * @throws \Exception
-     * Author: zsw zswemail@qq.com
      */
-    final public static function instance( string $engine = '' )
+    final public static function instance(bool $refresh = false): self
     {
+        if (static::$instance && ! $refresh)
+        {
+            return static::$instance;
+        }
+
         $config = config('curd');
-        $default = require __DIR__ . '/../config.php';
+        $default = require __DIR__.'/../config.php';
         $config = Helper::extends($default, $config);
-        $engine = $engine ? : $config['save'];
+        $engine = $config['save'];
         if ( ! class_exists(self::$engine[$engine]))
         {
             throw new \Exception('class ['.$engine.'] does not exient');
@@ -100,22 +118,16 @@ abstract class Manage
         }
         $instance->init();
 
-        return $instance;
+        return static::$instance = $instance;
+    }
+
+    public static function getPrefix()
+    {
+        return self::$prefix ?: self::$prefix = Model::instance()->getConfig(self::PREFIX_CONFIG_LOCATION);
     }
 
     public function init()
     {
-    }
-
-    private static $db;
-
-    /**
-     * @return \think\Db | \think\DbManager | \think\db\connector\Mysql
-     * Author: zsw zswemail@qq.com
-     */
-    protected static function getDb()
-    {
-        return $db ?? $db = app()->db;
     }
 
     /**
@@ -129,7 +141,16 @@ abstract class Manage
     {
         $sql = "SELECT TABLE_NAME as `table` FROM information_schema.TABLES WHERE TABLE_SCHEMA = :database ";
 
-        return self::getDb()->query($sql, ['database' => static::getDb()->getConfig(self::TABLE_NAME_CONFIG)]);
+        $tables = Model::instance()->query($sql, ['database' => Model::instance()->getConfig(self::DATABASE_CONFIG_LOCATION)]);
+
+        $prefix = self::getPrefix();
+
+        return array_map(
+            function ($t) use ($prefix)
+            {
+                return ltrim($t['table'], $prefix);
+            }, $tables
+        );
     }
 
     /**
@@ -138,29 +159,30 @@ abstract class Manage
      * @param string $table
      *
      * @return array
-     * @throws \think\db\exception\BindParamException
      */
-    protected function tablesInfo($table = '')
+    protected function tablesInfo(string $table = '')
     {
+        $prefix = self::getPrefix();
         if ($table)
         {
-            $table = static::filter($table);
-            $table = " AND TABLE_NAME = '{$table}'";
+            $table = static::sqlFilter($table);
+            $table = " AND TABLE_NAME = '{$prefix}{$table}'";
         }
+
         $sql
             = "SELECT TABLE_NAME as `table`,TABLE_COMMENT as `comment`,TABLE_ROWS as `rows`,ENGINE as `engine` FROM information_schema.TABLES WHERE TABLE_SCHEMA = :table "
             .$table;
-        $list = self::getDb()->query($sql, ['table' => self::getDb()->getConfig(self::TABLE_NAME_CONFIG)]);
+        $list = Model::instance()->query($sql, ['table' => Model::instance()->getConfig(self::DATABASE_CONFIG_LOCATION)]);
 
         foreach ($list as $k => $v)
         {
             $list[$k] = [
-                'table'          => $v['table'],
+                'table'          => ltrim($v['table'], $prefix),
                 'title'          => $v['comment'],
                 'description'    => $v['comment'],
                 'rows'           => $v['rows'],
                 'engine'         => $v['engine'],
-                'auto_timestamp' => true,
+                'datetime_fields' => [],
                 'button_default' => array_keys(TableMode::$buttonDefaultLabels),
                 'page'           => true,
                 'fields'         => [],
@@ -183,25 +205,27 @@ abstract class Manage
      * @throws \think\db\BindParamException
      * @throws \think\db\PDOException
      */
-    protected function fieldsInfo($table, $field = '')
+    protected function fieldsInfo($table, $field = null)
     {
-        $fields = self::getDb()->query("SHOW full columns FROM ".$table);
+        $fields = Model::instance()->query("SHOW full columns FROM " . self::getPrefix() . $table);
         $lists = [];
+
+        is_string($field) && $field = (array)$field;
 
         $weight = 10;
         foreach ($fields as $info)
         {
-            if ( ! $field || $info['Field'] == $field)
+            if ( null === $field || in_array($info['Field'], $field) )
             {
                 $list = [
-                    'title'         => $info['Comment'] ?: $info['Field'],
-                    'field'         => $info['Field'],
-                    'type'          => $info['Type'],
-                    'key'           => $info['Key'],
-                    'null'          => $info['Null'],
-                    'default'       => $info['Default'],
-                    'auto_increment'=> strpos($info['Extra'], 'auto_increment') !== false,
-                    'weight'        => $weight,
+                    'title'          => $info['Comment'] ?: $info['Field'],
+                    'field'          => $info['Field'],
+                    'type'           => $info['Type'],
+                    'key'            => $info['Key'],
+                    'null'           => $info['Null'],
+                    'default'        => $info['Default'],
+                    'auto_increment' => strpos($info['Extra'], 'auto_increment') !== false,
+                    'weight'         => $weight,
 
                     "search_type"   => "_",
                     "search"        => "=",
@@ -251,7 +275,7 @@ abstract class Manage
      *
      * @return string
      */
-    protected static function filter(string $str): string
+    protected static function sqlFilter(string $str): string
     {
         $str = addslashes($str);
 
@@ -291,7 +315,7 @@ abstract class Manage
     }
 
     /**
-     * 过滤非字段
+     * 过滤非注册字段
      *
      * @param array $data
      *
@@ -318,7 +342,10 @@ abstract class Manage
      * @return array
      * Author: zsw zswemail@qq.com
      */
-    abstract public function table($table): array;
+    public function table($table): array
+    {
+        return $this->tables($table)[0] ?? [];
+    }
 
     /**
      * 返回所有表信息
@@ -339,7 +366,10 @@ abstract class Manage
      * @return array
      * Author: zsw zswemail@qq.com
      */
-    abstract public function field($table, $field): array;
+    public function field($table, $field): array
+    {
+        return $this->fields($table, $field)[0] ?? [];
+    }
 
     /**
      * 返回所有字段信息
@@ -366,7 +396,7 @@ abstract class Manage
     /**
      * 清理配置
      *
-     * @param      $table 删除表
+     * @param      $table  删除表
      * @param null $fields 删除字段
      *
      * @return mixed

@@ -7,7 +7,7 @@ namespace iszsw\curd\controller;
 
 use iszsw\curd\Helper;
 use iszsw\curd\lib\Model;
-use think\exception\HttpException;
+use iszsw\curd\lib\ResolveField;
 
 /**
  * 自动生成页面
@@ -22,11 +22,7 @@ class Page extends Common
 
     public function __construct()
     {
-        $this->table = $_GET['_table'] ?? '';
-        if ( !$this->table )
-        {
-            throw new HttpException(404);
-        }
+        $this->table = request()->param('_table');
     }
 
     public function index()
@@ -39,25 +35,37 @@ class Page extends Common
         return $this->createForm(new page\Form($this->table));
     }
 
-    public function change()
+    public function change($field, $value)
     {
-        $model = Model::instance($this->table);
-        $post  = input();
-        if ($model->save($post)) {
+        $model = (new ResolveField($this->table));
+        $pkKey = $model->pk;
+        $pk = input($pkKey);
+
+        if (!$pk) {
+            return Helper::error("修改失败");
+        }
+
+        if ($model->save([$pkKey => $pk, $field => $value]))
+        {
             return Helper::success('编辑成功');
         }
+
         return Helper::error($model->getError());
     }
 
     public function delete()
     {
-        $post  = input();
-        $model = Model::instance($this->table);
-        $pk = $model->getPk();
-        if (($post[$pk] ?? false) && $model->destroy($post[$pk])) {
+        $model = (new ResolveField($this->table));
+        $pkKey = $model->pk;
+        $data = (array)input($pkKey);
+
+        if ($model->delete($data))
+        {
             return Helper::success('删除成功');
         }
-        return Helper::error('删除失败');
+
+        return Helper::error($model->getError());
+
     }
 
 }
