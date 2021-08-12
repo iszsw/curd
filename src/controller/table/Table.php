@@ -36,10 +36,10 @@ class Table extends TableAbstract
         $prefix = Manage::getPrefix();
         return (new Component(['el' => 'div']))->children(
             [
-                (new Component())->el('div')->children(
+                (new Component())->el('p')->children(
                     [
-                        (new Component())->el('h2')->children(['数据表管理']),
-                        (new Component())->el('p')->children(["表前缀【{$prefix}】 "]),
+                        (new Component())->el('div')->class('title')->children(['数据表管理']),
+                        (new Component())->el('p')->class('describe')->children(["表前缀【{$prefix}】 "]),
                         (new Component())->el('p')->domProps('innerHTML', "CURD访问页面：<b>{$url}表名(不带前缀)</b>"),
                     ]
                 ),
