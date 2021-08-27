@@ -177,7 +177,7 @@ abstract class Manage
         foreach ($list as $k => $v)
         {
             $list[$k] = [
-                'table'          => 0 === strpos($v['table'], $prefix) ? substr($v['table'], strlen($prefix)) : $v['table'],
+                'table'          => $prefix && 0 === strpos($v['table'], $prefix) ? substr($v['table'], strlen($prefix)) : $v['table'],
                 'title'          => $v['comment'],
                 'description'    => $v['comment'],
                 'rows'           => $v['rows'],
