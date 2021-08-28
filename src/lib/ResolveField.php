@@ -290,11 +290,8 @@ class ResolveField extends Resolve
                     $relation[$k] = $v;
                 } elseif (in_array($k, $fields))
                 {
-                    $post[$k] = $this->invoke($field['save_format'], $v, $post);
-                    if ($v === null)
-                    {
-                        unset($post[$k]);
-                    } else
+                    $post[$k] = $v = $this->invoke($field['save_format'], $v, $post);
+                    if ($v !== null)
                     {
                         if (is_array($v))
                         {
@@ -303,8 +300,8 @@ class ResolveField extends Resolve
                         {
                             $post[$k] = $this->detection($k, $v);
                         }
+                        continue;
                     }
-                    continue;
                 }
 
                 unset($post[$k]);
@@ -385,14 +382,14 @@ class ResolveField extends Resolve
     {
         $type = $this->parseFieldType($this->getFieldsType($field)['type']);
 
+        $value = $this->formatDatetime($field, $value, $type);
+
         $bindType = $this->getFieldsBindType($field);
         switch ($bindType){
             case 'int':
                 $value = (int)$value;
                 break;
         }
-
-        $value = $this->formatDatetime($field, $value, $type);
 
         return $value;
     }

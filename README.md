@@ -59,7 +59,7 @@ $ composer require iszsw/curd
 
 ## 介绍
 
-> **邮件** zswemail@qqcom
+> **邮件** iszsw@qq.com
 >
 > **主页**  [https://zsw.ink](https://zsw.ink) 留言
 
