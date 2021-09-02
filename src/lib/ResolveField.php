@@ -49,7 +49,7 @@ class ResolveField extends Resolve
 
     private $fieldsType;
 
-    protected function getFieldsType(?string$field = null)
+    protected function getFieldsType(?string $field = null)
     {
         if ( ! $this->fieldsType)
         {
@@ -77,12 +77,13 @@ class ResolveField extends Resolve
      * @param        $config
      * @param null   $default 默认值
      * @param string $type    类型
+     * @param bool $search    搜索类型
      *
      * @return array
      */
-    protected function resolveFormColumn(array $config, $default = null, $type = 'input'): array
+    protected function resolveFormColumn(array $config, $default = null, $type = 'input', $search = false): array
     {
-        return $this->resolveColumnByProps(Helper::paramsFormat($config['form_extend'] ?? []), $config, $default, $type);
+        return $this->resolveColumnByProps(Helper::paramsFormat($config[$search ? 'search_extend' : 'form_extend'] ?? []), $config, $default, $type);
     }
 
     protected function resolveColumnByProps(array $props, array $config, $default, $type = 'input')
@@ -143,7 +144,7 @@ class ResolveField extends Resolve
             {
                 continue;
             }
-            $column = $this->resolveFormColumn($config, $this->data[$config['field']] ?? null, $type);
+            $column = $this->resolveFormColumn($config, $this->data[$config['field']] ?? null, $type, $search);
             if (count($column))
             {
                 if (count($config["form_format"]))
@@ -151,7 +152,7 @@ class ResolveField extends Resolve
                     $column['value'] = $this->invoke($config["form_format"], $column['value'], $this->data);
                 }
 
-                $cModel = $this->generateForm($column['type'], $column['field'], $column['title'], $column['value'], $column['props'], $column['options']);
+                $cModel = $this->generateForm($column['type'], $column['field'], $column['title'], $search ? null : $column['value'], $column['props'], $column['options']);
                 if ($config['marker'])
                 {
                     $cModel->marker($config['marker']);
@@ -290,8 +291,11 @@ class ResolveField extends Resolve
                     $relation[$k] = $v;
                 } elseif (in_array($k, $fields))
                 {
-                    $post[$k] = $v = $this->invoke($field['save_format'], $v, $post);
-                    if ($v !== null)
+                    $post[$k] = $this->invoke($field['save_format'], $v, $post);
+                    if ($v === null)
+                    {
+                        unset($post[$k]);
+                    } else
                     {
                         if (is_array($v))
                         {
@@ -300,8 +304,8 @@ class ResolveField extends Resolve
                         {
                             $post[$k] = $this->detection($k, $v);
                         }
-                        continue;
                     }
+                    continue;
                 }
 
                 unset($post[$k]);
@@ -382,14 +386,14 @@ class ResolveField extends Resolve
     {
         $type = $this->parseFieldType($this->getFieldsType($field)['type']);
 
-        $value = $this->formatDatetime($field, $value, $type);
-
         $bindType = $this->getFieldsBindType($field);
         switch ($bindType){
             case 'int':
                 $value = (int)$value;
                 break;
         }
+
+        $value = $this->formatDatetime($field, $value, $type);
 
         return $value;
     }
