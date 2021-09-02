@@ -152,7 +152,7 @@ class ResolveField extends Resolve
                     $column['value'] = $this->invoke($config["form_format"], $column['value'], $this->data);
                 }
 
-                $cModel = $this->generateForm($column['type'], $column['field'], $column['title'], $search ? null : $column['value'], $column['props'], $column['options']);
+                $cModel = $this->generateForm($column['type'], $column['field'], $column['title'], $column['value'], $column['props'], $column['options']);
                 if ($config['marker'])
                 {
                     $cModel->marker($config['marker']);
