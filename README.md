@@ -31,7 +31,7 @@ github地址：[https://github.com/iszsw/curd](https://github.com/iszsw/curd)
 
 ## 文档
 
-[https://www.kancloud.cn/zswok/think-curd【完善中...】](https://www.kancloud.cn/zswok/think-curd)
+[https://www.kancloud.cn/iszsw/think-curd【完善中...】](https://www.kancloud.cn/iszsw/think-curd)
 
 ## 演示
 
