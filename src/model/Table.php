@@ -129,6 +129,7 @@ class Table
     const BTN_TYPE_SUBMIT = 'submit';
     const BTN_TYPE_CONFIRM = 'confirm';
     const BTN_TYPE_REFRESH = 'refresh';
+    const BTN_TYPE_CUSTOM = 'custom';
 
     public static $btnTypeLabels
         = [
@@ -136,6 +137,7 @@ class Table
             self::BTN_TYPE_SUBMIT  => '提交',
             self::BTN_TYPE_CONFIRM => '确认',
             self::BTN_TYPE_REFRESH => '刷新',
+            self::BTN_TYPE_CUSTOM  => '自定义',
         ];
 
     public static $formatTypes

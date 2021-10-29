@@ -21,6 +21,10 @@ return [
      */
     'surface' => [
         'table' => [
+            'style' => [ // 公共资源
+            ],
+            'script' => [ // 公共脚本
+            ],
             'globals' => [
                 'props' => [ // props参数
                     'emptyText' => "没有更多",
@@ -28,6 +32,10 @@ return [
             ],
         ],
         'form'  => [
+            'style' => [ // 公共资源
+            ],
+            'script' => [ // 公共脚本
+            ],
             'globals' => [
 
             ],

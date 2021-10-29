@@ -69,6 +69,7 @@ class Form extends FormAbstract
                             Helper::formatOptions([
                                                       TableModel::BTN_TYPE_PAGE    => TableModel::$btnTypeLabels[TableModel::BTN_TYPE_PAGE],
                                                       TableModel::BTN_TYPE_CONFIRM => TableModel::$btnTypeLabels[TableModel::BTN_TYPE_CONFIRM],
+                                                      TableModel::BTN_TYPE_CUSTOM => TableModel::$btnTypeLabels[TableModel::BTN_TYPE_CUSTOM],
                                                   ])
                         )->visible([['prop' => 'button_local', 'value' => TableModel::LOCAL_RIGHT]]),
 
@@ -79,7 +80,7 @@ class Form extends FormAbstract
                         ),
 
                         (new Input('url', TableModel::$labels["url"]))
-                            ->visible([['exec' => 'model.button_local !== "'.TableModel::LOCAL_TOP.'" || model.top_type !== "'.TableModel::BTN_TYPE_REFRESH.'"']]),
+                            ->visible([['exec' => 'model.button_local !== "'.TableModel::LOCAL_TOP.'" || (model.top_type !== "'.TableModel::BTN_TYPE_REFRESH.'" && model.top_type !== "'.TableModel::BTN_TYPE_CUSTOM.'")']]),
                         (new Arrays('data_extend', TableModel::$labels['data_extend'], []))->options(
                             [
                                 (new Input(TableModel::KEY, TableModel::$labels[TableModel::KEY]))->item(false),
@@ -91,7 +92,7 @@ class Form extends FormAbstract
                                 (new Input(TableModel::KEY, TableModel::$labels[TableModel::KEY]))->item(false),
                                 (new Input(TableModel::VALUE, TableModel::$labels[TableModel::VALUE]))->item(false),
                             ]
-                        )->marker('按钮样式扩展(el-button的 props或者Component) type=>primary'),
+                        )->marker('按钮样式扩展(el-button的 props) type=>primary, class => export'),
                     ]
                 )->marker("自定义的操作按钮"),
 

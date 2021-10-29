@@ -354,6 +354,8 @@ class ResolveTable extends Resolve
                     ], $param['confirm_msg'] ?? '', $this->table['pk']
                 );
                 break;
+            case TableModel::BTN_TYPE_CUSTOM:
+                break;
         }
 
         if (count($param['btn_extend']) > 0)
