@@ -69,7 +69,6 @@ class Form extends FormAbstract
                             Helper::formatOptions([
                                                       TableModel::BTN_TYPE_PAGE    => TableModel::$btnTypeLabels[TableModel::BTN_TYPE_PAGE],
                                                       TableModel::BTN_TYPE_CONFIRM => TableModel::$btnTypeLabels[TableModel::BTN_TYPE_CONFIRM],
-                                                      TableModel::BTN_TYPE_CUSTOM => TableModel::$btnTypeLabels[TableModel::BTN_TYPE_CUSTOM],
                                                   ])
                         )->visible([['prop' => 'button_local', 'value' => TableModel::LOCAL_RIGHT]]),
 
