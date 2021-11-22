@@ -183,7 +183,7 @@ class ResolveField extends Resolve
 
     public function setData($pk)
     {
-        $this->original = Model::instance()->name($this->table['table'])->findOrFail($pk);
+        $this->original = is_array($pk) ? $pk : Model::instance()->name($this->table['table'])->findOrFail($pk);
         foreach ($this->fields as $v)
         {
             $this->data[$v['field']] = $this->resolveFormDefault($v, $this->original[$v['field']] ?? '', $this->original);

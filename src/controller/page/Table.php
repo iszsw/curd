@@ -28,7 +28,7 @@ class Table extends TableAbstract
 
     public function search(): ?FormAbstract
     {
-        return new Search($this->tableName);
+        return $this->table->hasSearch() ? new Search($this->tableName) : null;
     }
 
     public function header(): ?Component

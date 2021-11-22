@@ -27,13 +27,6 @@ class ResolveTable extends Resolve
     private $options;
 
     /**
-     * 搜索条件
-     *
-     * @var array
-     */
-    private $search;
-
-    /**
      * 列项
      *
      * @var array
@@ -66,6 +59,23 @@ class ResolveTable extends Resolve
         }
 
         return $this->column;
+    }
+
+    protected $hasSearch;
+
+    public function hasSearch($force = false):bool {
+        if ($force || null === $this->hasSearch) {
+            // columns
+            foreach ($this->table['fields'] as $k => $f)
+            {
+                if ($f['table_type'] !== '_')
+                {
+                    $this->hasSearch = true;
+                    break;
+                }
+            }
+        }
+        return $this->hasSearch;
     }
 
     /**
@@ -154,51 +164,6 @@ class ResolveTable extends Resolve
         $component->scopedSlots([$child]);
 
         return $component;
-    }
-
-    public function getSearch()
-    {
-        if (is_null($this->search))
-        {
-            $this->search = [];
-            $this->resolveSearch();
-        }
-
-        return $this->search;
-    }
-
-    private function resolveSearch()
-    {
-        foreach ($this->table['fields'] as $v)
-        {
-            if ( ! $v['search'])
-            {
-                continue;
-            }
-            if ($v['form_type'] == 'hidden')
-            {
-                $v['form_type'] = 'text';
-            }
-            $form = $this->resolveSearchColumn($v, input($v['field'], null));
-            if (isset($form['options']))
-            {
-                $form['props']['options'] = $form['options'];
-            }
-            $this->search[] = [$v['search'], $form['type'], $form['field'], $form['title'], $form['value'], ['props' => $form['props']]];
-        }
-    }
-
-    /**
-     * 搜索参数配置解析
-     *
-     * @param      $field
-     * @param null $default 默认值
-     *
-     * @return array
-     */
-    private function resolveSearchColumn(array $field, $default = null): array
-    {
-        return $this->resolveColumnByProps(json_decode($field['search_extend'], true) ?? [], $field, $default, $field['search_type']);
     }
 
     /**

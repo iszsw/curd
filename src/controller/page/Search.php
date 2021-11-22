@@ -22,9 +22,7 @@ class Search extends FormAbstract
     {
         $this->tableName = $tableName;
         $this->form = (new ResolveField($this->tableName));
-        if ($pk = input($this->form->pk, null)) {
-            $this->form->setData($pk);
-        }
+        $this->form->setData(request()->except(['_table']));
     }
 
     public function rules(): array
