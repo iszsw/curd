@@ -5,15 +5,11 @@
     "authors": [
         {
             "name": "zsw",
-            "email": "zswemail@qq.com"
+            "email": "iszsw@qq.com"
         }
     ],
     "homepage": "https://zsw.ink/",
-    "keywords": [
-        "ThinkPHP",
-        "iszsw",
-        "curd"
-    ],
+    "keywords": ["curd", "Low code", "surface", "php"],
     "support": {
         "issues": "https://github.com/iszsw/curd/issues",
         "source": "https://github.com/iszsw/curd"
