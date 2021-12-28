@@ -8,7 +8,7 @@ use iszsw\curd\model\Table;
  * 助手类
  *
  * @package iszsw\curd
- * Author: zsw zswemail@qq.com
+ * Author: zsw iszsw@qq.com
  */
 class Helper
 {
@@ -24,7 +24,7 @@ class Helper
      */
     public static function builder_table_url(string $url, array $param = [], $domain = false)
     {
-        $url = '/' . config('curd.route_prefix') . '/' . trim($url, "\\/");
+        $url = '/' . config('curd.route_prefix') . ($url ?  '/' . trim($url, "\\/") : '');
         $domain && $url = request()->domain() . $url;
         if ($param) {
             $url .= (strpos( $url, '?' ) === false ? '?' : '&' ) .http_build_query($param);

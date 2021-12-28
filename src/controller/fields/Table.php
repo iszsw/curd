@@ -18,11 +18,11 @@ use surface\table\components\Writable;
 class Table extends TableAbstract
 {
 
-    private $table;
+    protected $table;
 
-    public function __construct()
+    public function __construct(string $table = '')
     {
-        $this->table = input('table', '');
+        $this->table = $table;
     }
 
     public function header(): ?Component
@@ -35,7 +35,7 @@ class Table extends TableAbstract
                         (new Component())->el('p')->class('describe')->children(["修改表中字段在页面中显示的样式"]),
                     ]
                 ),
-                (new Button('el-icon-plus', '添加'))->createPage(Helper::builder_table_url('fields/update', ['table'=>$this->table]))->props('doneRefresh', true),
+                (new Button('el-icon-plus', '添加'))->createPage(Helper::builder_table_url('fields/create/'.$this->table))->props('doneRefresh', true),
                 (new Button('el-icon-refresh', '刷新'))->createRefresh()->props('doneRefresh', true),
             ]
         );
@@ -47,16 +47,17 @@ class Table extends TableAbstract
         $formTypes = TableModel::getFormServersLabels();
         foreach ($list as &$v)
         {
-            $v['id'] = $v['field'];
-            (isset($v['field_label']) && $v['field_label']) || $v['field_label'] = $v['field'].((isset($v['key']) && $v['key']) ? "【{$v['key']}】" : '') . ($v['relation'] ? '【增】' : '');
-            $v['search'] =  $formTypes[$v['search_type']] . ($v['search_type'] !== '_' ? "  【{$v['search']}】 " : '');
+            $v['name'] = $v['field'];
+            (isset($v['field_label']) && $v['field_label'])
+            || $v['field_label'] = $v['field'].((isset($v['key']) && $v['key']) ? "【{$v['key']}】" : '').($v['relation'] ? '【增】' : '');
+            $v['search'] = $formTypes[$v['search_type']].($v['search_type'] !== '_' ? "  【{$v['search']}】 " : '');
         }
         unset($v);
 
         return [
             'props' => [
-                'data' => $list
-            ]
+                'data' => $list,
+            ],
         ];
     }
 
@@ -65,20 +66,27 @@ class Table extends TableAbstract
         $formTypes = TableModel::getFormServersLabels();
         $tableTypes = TableModel::getTableServersLabels();
 
-        $changeUrl = Helper::builder_table_url('fields/change', ['table' => $this->table]);
-        $deleteUrl = Helper::builder_table_url('fields/delete', ['table' => $this->table]);
-        $editUrl   = Helper::builder_table_url('fields/update', ['table' => $this->table]);
+        // name = field
+        $changeUrl = Helper::builder_table_url("fields/change/{$this->table}/{name}");
+        $deleteUrl = Helper::builder_table_url("fields/delete/{$this->table}/{name}");
+        $editUrl = Helper::builder_table_url("fields/update/{$this->table}/{name}");
 
         return [
             (new Column('weight', TableModel::$labels['weight']))->scopedSlots(
                 [
-                    (new Writable())->props(['method' => 'post', 'doneRefresh'=>!0, 'async' => ['url' => $changeUrl, 'method' => 'post', 'data' => ['id']]]),
+                    (new Writable())->props(
+                        [
+                            'method'      => 'post',
+                            'doneRefresh' => ! 0,
+                            'async'       => ['url' => $changeUrl, 'method' => 'post'],
+                        ]
+                    ),
                 ]
             )->props('width', '80px'),
             (new Column('field_label', TableModel::$labels['field']))->props(['min-width' => '120px']),
             (new Column('title', TableModel::$labels['title']))->props(['min-width' => '200px'])->scopedSlots(
                 [
-                    (new Writable())->props(['async' => ['url' => $changeUrl, 'method' => 'post', 'data'=>['id']]]),
+                    (new Writable())->props(['async' => ['url' => $changeUrl, 'method' => 'post']]),
                 ]
             ),
             (new Column('type', TableModel::$labels['type']))->props(['min-width' => '150px']),
@@ -86,7 +94,7 @@ class Table extends TableAbstract
                 [
                     (new Select())->props(
                         [
-                            'async'   => ['method' => 'post', 'data' => ['id'], 'url' => $changeUrl],
+                            'async'   => ['method' => 'post', 'url' => $changeUrl],
                             'options' => $tableTypes,
                         ]
                     ),
@@ -96,7 +104,7 @@ class Table extends TableAbstract
                 [
                     (new Select())->props(
                         [
-                            'async'   => ['method' => 'post', 'data' => ['id'], 'url' => $changeUrl],
+                            'async'   => ['method' => 'post', 'url' => $changeUrl],
                             'options' => $formTypes,
                         ]
                     )->options(),
@@ -107,7 +115,7 @@ class Table extends TableAbstract
                 [
                     (new Switcher())->props(
                         [
-                            'async'   => ['method' => 'post', 'data' => ['id'], 'url' => $changeUrl],
+                            'async'   => ['method' => 'post', 'url' => $changeUrl],
                             'options' => TableModel::$statusLabels,
                         ]
                     ),
@@ -118,9 +126,9 @@ class Table extends TableAbstract
             (new Column('options', '操作'))->props('fixed', 'right')->props('width', '100px')
                 ->scopedSlots(
                     [
-                        (new Button('el-icon-edit-outline', '修改'))->createPage($editUrl, ['field'])->props('doneRefresh', true),
+                        (new Button('el-icon-edit-outline', '修改'))->createPage($editUrl)->props('doneRefresh', true),
                         (new Button('el-icon-close', '删除'))
-                            ->createConfirm('删除或者初始化字段，确认操作？', ['method' => 'post', 'data' => ['field'], 'url' => $deleteUrl])
+                            ->createConfirm('删除或者初始化字段，确认操作？', ['method' => 'post', 'url' => $deleteUrl])
                             ->props('doneRefresh', true),
                     ]
                 ),

@@ -1,11 +1,15 @@
 <?php
 
 return [
-    'route_prefix' => 'curd',     // 路由前缀 通过访问 /curd.html 访问表格页面
-    'save' => \iszsw\curd\lib\Manage::FILE_NAME, // 默认 存储类型
+    // 路由前缀 通过访问 /curd.html 访问表格页面
+    'route_prefix' => 'curd',
+    // 默认 存储类型
+    'save' => \iszsw\curd\lib\Manage::FILE_NAME,
     'engine' => [
+        // 目前只有文件存储
         \iszsw\curd\lib\Manage::FILE_NAME => [
-            'save_path' => runtime_path('curd'), // 数据保存地址 确保路径的可读写
+            // 数据保存地址 确保路径的可读写
+            'save_path' => runtime_path('curd'),
         ]
     ],
 
@@ -20,6 +24,8 @@ return [
      * Table.globals.props 参数 https://element.eleme.cn/#/zh-CN/component/table#table-attributes
      */
     'surface' => [
+        // 静态资源CDN地址
+        'cdn'   => '',
         'table' => [
             'style' => [ // 公共资源
             ],

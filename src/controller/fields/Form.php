@@ -21,12 +21,21 @@ class Form extends FormAbstract
 
     const CASCADER_SEPARATOR = '.';
 
+
+    protected $table;
+
+    protected $field;
+
+    public function __construct($table, $field)
+    {
+        $this->table = $table;
+        $this->field = $field;
+    }
+
     public function columns(): array
     {
-        $table = input('table', '');
-        $field = input('field', '');
-        $create = ! $field;
-        $data = $create ? [] : Manage::instance()->field($table, $field);
+        $create = ! $this->field;
+        $data = $create ? [] : Manage::instance()->field($this->table, $this->field);
         $formTypes = Helper::formatOptions(TableModel::getFormServersLabels());
         $tableTypes = Helper::formatOptions(TableModel::getTableServersLabels());
 
@@ -79,7 +88,7 @@ class Form extends FormAbstract
         $formChildren = [
             (new Select("form_type", TableModel::$labels["form_type"], $data['form_type'] ?? "_"))
                 ->options($formTypes),
-            (new Input("marker", TableModel::$labels['marker'], $data['marker'] ?? ''))->props(['type' => 'textarea'])->marker('支持HTML'),
+            (new Input("marker", TableModel::$labels['marker'], $data['marker'] ?? ''))->props(['type' => 'textarea'])->marker('提示文本会显示在表单下面，支持HTML'),
             (new Select("form_format", TableModel::$labels["form_format"], $data['form_format'] ?? ''))
                 ->props(['allow-create' => true, 'filterable' => true, 'multiple' => true, 'default-first-option' => true])
                 ->options(Helper::formatOptions(TableModel::$formatTypes))
@@ -113,7 +122,7 @@ class Form extends FormAbstract
             (new Hidden('relation', (int)$remote_relation_state)),
             (new Input('field', TableModel::$labels['field'], $data['field'] ?? ""))->props(['readonly' => ! $create]),
             new Input('title', TableModel::$labels['title'], $data['title'] ?? ""),
-            new Number('weight', TableModel::$labels['weight'], $data['weight'] ?? ""),
+            (new Number('weight', TableModel::$labels['weight'], $data['weight'] ?? ""))->marker('权重越高字段显示越靠前'),
         ];
 
         if ($remote_relation_state)
@@ -136,10 +145,10 @@ class Form extends FormAbstract
                                ->props(
                                    [
                                        'async' => [
-                                           'url' => Helper::builder_table_url('fields/relation', ['table' => $table]),
+                                           'url' => Helper::builder_table_url('fields/relation/'.$this->table),
                                        ],
                                    ]
-                               )->marker("中间表 / {$table}主键 / 中间表与{$table}表的关联键 / 中间表与关联表的关联键 / 关联表 / 关联表主键 / 关联表可视字段名"),
+                               )->marker("中间表 / {$this->table}主键 / 中间表与{$this->table}表的关联键 / 中间表与关联表的关联键 / 关联表 / 关联表主键 / 关联表可视字段名"),
                        ]
             );
         } else
@@ -245,8 +254,6 @@ class Form extends FormAbstract
         $post = input();
         try
         {
-            $table = $post['table'];
-            $field = $post['field'];
             $post['relation'] = ! ! $post['relation'];
             foreach (['form_extend', 'search_extend', 'table_extend', 'option_config'] as $k)
             {
@@ -268,7 +275,7 @@ class Form extends FormAbstract
                 );
             }
 
-            Manage::instance()->save(['table' => $table, 'fields' => [$field => $post]]);
+            Manage::instance()->save(['table' => $this->table, 'fields' => [$this->field => $post]]);
         } catch (\Exception $e)
         {
             $this->error = $e->getMessage();

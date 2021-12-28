@@ -1,6 +1,6 @@
 <?php
 /**
- * Author: zsw zswemail@qq.com
+ * Author: zsw iszsw@qq.com
  */
 
 namespace iszsw\curd\lib;
@@ -13,7 +13,7 @@ class Model
     private static $instance;
 
     /**
-     * Author: zsw zswemail@qq.com
+     * Author: zsw iszsw@qq.com
      */
     public static function instance()
     {

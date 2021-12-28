@@ -1,11 +1,12 @@
 <?php
 /**
- * Author: zsw zswemail@qq.com
+ * Author: zsw iszsw@qq.com
  *
  */
 
 namespace iszsw\curd\lib;
 
+use iszsw\curd\exception\CurdException;
 use iszsw\curd\model\Table;
 use surface\table\Type;
 use think\exception\HttpException;
@@ -26,6 +27,9 @@ abstract class Resolve
         if ( ! $this->table)
         {
             throw new HttpException(404, "表【{$table}】不存在");
+        }
+        if ($this->table['status'] === false) {
+            throw new HttpException(404, 'Route Not Found');
         }
     }
 
@@ -99,7 +103,7 @@ abstract class Resolve
                 try {
                     $reflect = new \ReflectionClass($func[0]);
                 } catch (\Exception $e) {
-                    throw new \Exception('class not exists: ' . $func[0]);
+                    throw new CurdException('class not exists: ' . $func[0]);
                 }
                 if ($reflect->hasMethod($func[1])) {
                     $method = $reflect->getMethod($func[1]);
@@ -110,7 +114,7 @@ abstract class Resolve
                         $val = (new $func[0]())->$func[1]($val, $row, ...$params);
                     }
                 }else{
-                    throw new \Exception('method not exists: ' . $func[1]);
+                    throw new CurdException('method not exists: ' . $func[1]);
                 }
             } elseif (is_string($func) && function_exists($func))
             {

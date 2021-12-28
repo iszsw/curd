@@ -1,6 +1,6 @@
 <?php
 /**
- * Author: zsw zswemail@qq.com
+ * Author: zsw iszsw@qq.com
  *
  */
 
@@ -149,7 +149,7 @@ class ResolveTable extends Resolve
                         'async'       => [
                             'method' => 'post',
                             'data'   => ['id'],
-                            'url'    => Helper::builder_table_url('page/change', ['_table' => $this->table['table']]),
+                            'url'    => Helper::builder_table_url('page/change/'.$this->table['table']),
                         ],
                         'doneRefresh' => true,
                     ]
@@ -217,7 +217,7 @@ class ResolveTable extends Resolve
                                    "title"        => TableModel::$buttonDefaultLabels[TableModel::BUTTON_CREATE],
                                    "button_local" => TableModel::LOCAL_TOP,
                                    "top_type"     => TableModel::BTN_TYPE_PAGE,
-                                   "url"          => Helper::builder_table_url('page/create', ['_table' => $this->table['table']]),
+                                   "url"          => Helper::builder_table_url('page/create/'.$this->table['table']),
                                ]
                     );
                     break;
@@ -230,7 +230,7 @@ class ResolveTable extends Resolve
                                    "button_local" => TableModel::LOCAL_RIGHT,
                                    "right_type"   => TableModel::BTN_TYPE_PAGE,
                                    "data_extend"  => [$this->table['pk'],],
-                                   "url"          => Helper::builder_table_url('page/update', ['_table' => $this->table['table']]),
+                                   "url"          => Helper::builder_table_url('page/update/'.$this->table['table']),
                                ]
                     );
                     break;
@@ -243,7 +243,7 @@ class ResolveTable extends Resolve
                                    "button_local" => TableModel::LOCAL_TOP,
                                    "top_type"     => TableModel::BTN_TYPE_SUBMIT,
                                    "confirm_msg"  => "确认删除？",
-                                   "url"          => Helper::builder_table_url('page/delete', ['_table' => $this->table['table']]),
+                                   "url"          => Helper::builder_table_url('page/delete/'.$this->table['table']),
                                ]
                     );
                     array_unshift(
@@ -255,7 +255,7 @@ class ResolveTable extends Resolve
                                    "right_type"   => TableModel::BTN_TYPE_CONFIRM,
                                    "confirm_msg"  => "确认删除？",
                                    "data_extend"  => [$this->table['pk']],
-                                   "url"          => Helper::builder_table_url('page/delete', ['_table' => $this->table['table']]),
+                                   "url"          => Helper::builder_table_url('page/delete/'.$this->table['table']),
                                ]
                     );
                     break;
@@ -354,7 +354,7 @@ class ResolveTable extends Resolve
         return (new Component())->props(
             [
                 'async' => [
-                    'url' => Helper::builder_table_url('page', ['_table' => $this->table['table']]),
+                    'url' => Helper::builder_table_url('page/'.$this->table['table']),
                 ],
             ]
         );

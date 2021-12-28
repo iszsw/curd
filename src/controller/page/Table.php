@@ -6,6 +6,7 @@ use iszsw\curd\lib\ResolveTable;
 use surface\Component;
 use surface\helper\FormAbstract;
 use surface\helper\TableAbstract;
+use think\exception\HttpException;
 
 class Table extends TableAbstract
 {

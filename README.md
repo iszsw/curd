@@ -46,9 +46,9 @@ github地址：[https://github.com/iszsw/curd](https://github.com/iszsw/curd)
 $ composer require iszsw/curd
 ```
 
-> 1、框架中配置数据库
+> 1、配置数据库
 
-> 2、访问 http://域名/curd （路由前缀配置查看config/curd.php配置文件route_prefix）就是这么简单直接
+> 2、访问 http://域名/curd （路由前缀配置查看config/curd.php配置文件route_prefix）
 
 
 ## 说明
@@ -67,7 +67,7 @@ $ composer require iszsw/curd
 
 - 表
 
-[![cZxRxA.png](https://z3.ax1x.com/2021/07/03/RRm3ut.png)](https://z3.ax1x.com/2021/07/03/RRm3ut.png)
+[![cZxRxA.png](https://s4.ax1x.com/2021/12/28/TsTk0e.png)](https://s4.ax1x.com/2021/12/28/TsTk0e.png)
 
 
 - 页面

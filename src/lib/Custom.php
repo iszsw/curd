@@ -1,6 +1,6 @@
 <?php
 /**
- * Author: zsw zswemail@qq.com
+ * Author: zsw iszsw@qq.com
  *
  */
 
@@ -8,7 +8,7 @@ namespace iszsw\curd\lib;
 
 /**
  * 格式处理
- * Author: zsw zswemail@qq.com
+ * Author: zsw iszsw@qq.com
  */
 class Custom
 {
@@ -16,7 +16,7 @@ class Custom
      * 转日期时间格式
      * @param $data
      * @return false|string
-     * Author: zsw zswemail@qq.com
+     * Author: zsw iszsw@qq.com
      */
     public static function toDatetime($data, &$row)
     {
@@ -28,7 +28,7 @@ class Custom
      * @param $data
      *
      * @return false|string
-     * Author: zsw zswemail@qq.com
+     * Author: zsw iszsw@qq.com
      */
     public static function toDate($data)
     {
@@ -39,7 +39,7 @@ class Custom
      * 转时间格式
      * @param $data
      * @return false|string
-     * Author: zsw zswemail@qq.com
+     * Author: zsw iszsw@qq.com
      */
     public static function toTime($data)
     {
@@ -51,7 +51,7 @@ class Custom
      * 转时间戳格式
      * @param $data
      * @return false|int
-     * Author: zsw zswemail@qq.com
+     * Author: zsw iszsw@qq.com
      */
     public static function toTimestamp($data)
     {
@@ -87,7 +87,7 @@ class Custom
      * @param $row
      * @param string $str
      * @return false|int
-     * Author: zsw zswemail@qq.com
+     * Author: zsw iszsw@qq.com
      */
     public static function toReplace($data, $row, $str = '{data}')
     {

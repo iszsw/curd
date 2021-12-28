@@ -2,6 +2,7 @@
 
 namespace iszsw\curd\controller\table;
 
+use iszsw\curd\exception\CurdException;
 use iszsw\curd\Helper;
 use iszsw\curd\lib\Manage;
 use surface\form\components\Arrays;
@@ -15,17 +16,23 @@ use iszsw\curd\model\Table as TableModel;
 class Form extends FormAbstract
 {
 
-    public function columns(): array
+    protected $table;
+
+    public function __construct(string $table)
     {
-        $table = input('table', '');
         if ( ! $table)
         {
-            throw new \Exception("数据表[{$table}]不存在");
+            throw new CurdException("数据表[{$table}]不存在");
         }
-        $model = Manage::instance()->table($table);
+        $this->table = $table;
+    }
+
+    public function columns(): array
+    {
+        $model = Manage::instance()->table($this->table);
         if ( ! $model || count($model) < 1)
         {
-            throw new \Exception("参数错误");
+            throw new CurdException("参数错误");
         }
         $buttons = [];
         foreach ($model['button'] as $b) {
@@ -43,7 +50,8 @@ class Form extends FormAbstract
             (new Select('pk', TableModel::$labels['pk'], $model['pk']))->options(Helper::formatOptions($fields)),
             (new Input('title', TableModel::$labels['title'], $model['title'])),
             (new Input('description', TableModel::$labels['description'], $model['description'])),
-            (new Switcher('page', TableModel::$labels['page'], $model['page'])),
+            (new Switcher('page', TableModel::$labels['page'], $model['page']))
+                ->marker('取消分页功能，所有数据会同步返回页面'),
             (new Select('datetime_fields', TableModel::$labels["datetime_fields"], $model['datetime_fields'] ?? array_keys($defaultDateTime)))
                 ->options(Helper::formatOptions($fieldsOptions))
                 ->props(['filterable' => true, 'multiple' => true, 'default-first-option' => true])
@@ -51,17 +59,16 @@ class Form extends FormAbstract
             (new Select('button_default', TableModel::$labels["button_default"], $model['button_default'] ?? array_keys(TableModel::$buttonDefaultLabels)))
                 ->options(Helper::formatOptions(TableModel::$buttonDefaultLabels))
                 ->props(['filterable' => true, 'multiple' => true, 'default-first-option' => true])
-                ->marker('默认增、删、改、刷新按钮'),
+                ->marker('系统预设默认增、删、改、刷新按钮'),
 
             (new Arrays('button', TableModel::$labels['button'], $buttons))
                 ->props(['span' => 24, 'title' => ! 1, 'append' => ! 0])
                 ->options(
                     [
-                        (new Input('icon', TableModel::$labels["icon"])),
+                        (new Input('icon', TableModel::$labels["icon"]))->marker("<a target='_blank' href='https://element.eleme.cn/#/zh-CN/component/icon'>图标地址</a>"),
                         (new Input('title', TableModel::$labels["title"])),
                         (new Radio('button_local', TableModel::$labels["button_local"], $model['option_local'] ?? TableModel::LOCAL_TOP))
                             ->options(Helper::formatOptions(TableModel::$localLabels)),
-
                         (new Select('top_type', TableModel::$labels["button_type"], TableModel::BTN_TYPE_PAGE))
                             ->options(Helper::formatOptions(TableModel::$btnTypeLabels))
                             ->visible([['prop' => 'button_local', 'value' => TableModel::LOCAL_TOP]]),
@@ -79,13 +86,14 @@ class Form extends FormAbstract
                         ),
 
                         (new Input('url', TableModel::$labels["url"]))
-                            ->visible([['exec' => 'model.button_local !== "'.TableModel::LOCAL_TOP.'" || (model.top_type !== "'.TableModel::BTN_TYPE_REFRESH.'" && model.top_type !== "'.TableModel::BTN_TYPE_CUSTOM.'")']]),
+                            ->visible([['exec' => 'model.button_local !== "'.TableModel::LOCAL_TOP.'" || (model.top_type !== "'.TableModel::BTN_TYPE_REFRESH.'" && model.top_type !== "'.TableModel::BTN_TYPE_CUSTOM.'")']])
+                        ->marker("列按钮的地址支持变量替换（例如 【/edit/{id}?name={name}】根据当前列数据自动替换变量 'id'和'name'）"),
                         (new Arrays('data_extend', TableModel::$labels['data_extend'], []))->options(
                             [
                                 (new Input(TableModel::KEY, TableModel::$labels[TableModel::KEY]))->item(false),
                                 (new Input(TableModel::VALUE, TableModel::$labels[TableModel::VALUE]))->item(false),
                             ]
-                        )->marker('自定义提交的参数 user=>xxx'),
+                        )->marker('请求参数会生成在url?后面/curd?field=val，POST提交数据在请求体中  <br>1、自定义提交的参数 user=>xxx<br>2、如果选择列数据中的参数，索引值为空，列为字段名字'),
                         (new Arrays('btn_extend', TableModel::$labels['btn_extend'], []))->options(
                             [
                                 (new Input(TableModel::KEY, TableModel::$labels[TableModel::KEY]))->item(false),

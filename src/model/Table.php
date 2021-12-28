@@ -19,9 +19,10 @@ class Table
             self::VALUE     => '值',
             'table'         => '表名',
             'title'         => '名称',
+            'status'        => '启用',
             'description'   => '描述',
             'page'          => '分页',
-            'button'        => '操作',
+            'button'        => '自定义按钮',
             'extend'        => '扩展',
             'table_extend'  => '表格扩展',
             'form_extend'   => '表单扩展',
@@ -50,7 +51,7 @@ class Table
             'button_default'=> '默认按钮',
             'button_type'   => '按钮类型',
             'icon'          => '图标',
-            'marker'        => '提示',
+            'marker'        => '提示文本',
             'url'           => '地址',
             'tooltip'       => '提示',
             'data_extend'   => '提交参数',
@@ -120,8 +121,8 @@ class Table
 
     public static $localLabels
         = [
-            self::LOCAL_TOP   => '顶部',
-            self::LOCAL_RIGHT => '右侧',
+            self::LOCAL_TOP   => '顶部按钮',
+            self::LOCAL_RIGHT => '列按钮',
         ];
 
     const BTN_TYPE_PAGE = 'page';

@@ -1,11 +1,12 @@
 <?php
 /**
- * Author: zsw zswemail@qq.com
+ * Author: zsw iszsw@qq.com
  *
  */
 
 namespace iszsw\curd\lib;
 
+use iszsw\curd\exception\CurdException;
 use iszsw\curd\Helper;
 use iszsw\curd\lib\engine\File;
 use iszsw\curd\model\Table as TableMode;
@@ -40,6 +41,7 @@ abstract class Manage
         = [
             'table',            // 表
             'pk',               // 索引
+            'status',           // 状态
             'title',            // 标题
             'description',      // 描述
             'datetime_fields',   // 自动时间戳
@@ -109,12 +111,12 @@ abstract class Manage
         $engine = $config['save'];
         if ( ! class_exists(self::$engine[$engine]))
         {
-            throw new \Exception('class ['.$engine.'] does not exient');
+            throw new CurdException('class ['.$engine.'] does not exient');
         }
         $instance = new self::$engine[$engine]($config['engine'][$engine]);
         if ( ! $instance instanceof static)
         {
-            throw new \Exception('class ['.$engine.'] is not an instance of '.static::class);
+            throw new CurdException('class ['.$engine.'] is not an instance of '.static::class);
         }
         $instance->init();
 
@@ -184,6 +186,7 @@ abstract class Manage
                 'engine'         => $v['engine'],
                 'datetime_fields' => [],
                 'button_default' => array_keys(TableMode::$buttonDefaultLabels),
+                'status'         => true,
                 'page'           => true,
                 'fields'         => [],
                 'extend'         => '',
@@ -340,7 +343,7 @@ abstract class Manage
      * @param string $table
      *
      * @return array
-     * Author: zsw zswemail@qq.com
+     * Author: zsw iszsw@qq.com
      */
     public function table($table): array
     {
@@ -353,7 +356,7 @@ abstract class Manage
      * @param string $table
      *
      * @return array
-     * Author: zsw zswemail@qq.com
+     * Author: zsw iszsw@qq.com
      */
     abstract public function tables($table = ''): array;
 
@@ -364,7 +367,7 @@ abstract class Manage
      * @param string $field
      *
      * @return array
-     * Author: zsw zswemail@qq.com
+     * Author: zsw iszsw@qq.com
      */
     public function field($table, $field): array
     {
@@ -378,7 +381,7 @@ abstract class Manage
      * @param string $field
      *
      * @return array
-     * Author: zsw zswemail@qq.com
+     * Author: zsw iszsw@qq.com
      */
     abstract public function fields($table, $field = ''): array;
 
@@ -388,7 +391,7 @@ abstract class Manage
      * @param string $data
      *
      * @return bool
-     * Author: zsw zswemail@qq.com
+     * Author: zsw iszsw@qq.com
      */
     abstract public function save($data): bool;
 

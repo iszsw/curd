@@ -1,6 +1,6 @@
 <?php
 /**
- * Author: zsw zswemail@qq.com
+ * Author: zsw iszsw@qq.com
  *
  */
 
@@ -240,7 +240,7 @@ class ResolveField extends Resolve
         if ( ! $search)
         {
             $options['async'] = [
-                'url' => Helper::builder_table_url('page/update', ['_table' => $this->table['table']]),
+                'url' => Helper::builder_table_url('page/update/'.$this->table['table']),
             ];
         }
 

@@ -2,6 +2,7 @@
 
 namespace iszsw\curd\lib\engine;
 
+use iszsw\curd\exception\CurdException;
 use iszsw\curd\Helper;
 use iszsw\curd\lib\Manage;
 use iszsw\curd\lib\Model;
@@ -14,7 +15,7 @@ use iszsw\curd\model\Table as TableModel;
  * Class File
  *
  * @package iszsw\curd\lib\engine
- * Author: zsw zswemail@qq.com
+ * Author: zsw iszsw@qq.com
  */
 class File extends Manage
 {
@@ -128,13 +129,13 @@ class File extends Manage
                 case 'option_relation':
                     if (count($v['option_relation']) !== 3)
                     {
-                        throw new \Exception(Table::$labels['option_relation']."配置不能为空");
+                        throw new CurdException(Table::$labels['option_relation']."配置不能为空");
                     }
                     break;
                 case 'option_remote_relation':
                     if (count($v['option_remote_relation']) !== 7)
                     {
-                        throw new \Exception(Table::$labels['option_remote_relation']."配置不能为空");
+                        throw new CurdException(Table::$labels['option_remote_relation']."配置不能为空");
                     }
                     break;
             }
@@ -226,7 +227,7 @@ class File extends Manage
             fclose($handle);
         } else
         {
-            throw new \Exception('File '.$file.' does not have write permission');
+            throw new CurdException('File '.$file.' does not have write permission');
         }
 
         return true;

@@ -2,6 +2,7 @@
 
 namespace iszsw\curd\controller;
 
+use iszsw\curd\exception\CurdException;
 use iszsw\curd\Helper;
 use iszsw\curd\lib\Manage;
 
@@ -86,37 +87,37 @@ class Fields extends Common
         return $data;
     }
 
-    public function index()
+    public function index(string $table)
     {
-        return $this->createTable(new fields\Table());
+        return $this->createTable(new fields\Table($table));
     }
 
-    public function update()
+    public function update(string $table, string $name = '')
     {
-        return $this->createForm(new fields\Form());
+        return $this->createForm(new fields\Form($table, $name));
     }
 
-    public function delete($table, $field)
+    public function delete($table, $name)
     {
-        if ( ! $field)
+        if ( ! $name)
         {
             return Helper::error('请选择需要删除的字段');
         }
-        Manage::instance()->delete($table, $field);
+        Manage::instance()->delete($table, $name);
 
         return Helper::success('删除成功');
     }
 
-    public function change($table, $id, $field, $value)
+    public function change($table, $name, $field, $value)
     {
         try
         {
-            if ( ! $table || ! $field || ! $id)
+            if ( ! $table || ! $field)
             {
-                throw new \Exception("参数错误");
+                throw new CurdException("参数错误");
             }
 
-            Manage::instance()->save(['table' => $table, 'fields' => [$id => [$field => $value]]]);
+            Manage::instance()->save(['table' => $table, 'fields' => [$name => [$field => $value]]]);
         } catch (\Exception $e)
         {
             return Helper::error($e->getMessage() ?: '修改失败');;

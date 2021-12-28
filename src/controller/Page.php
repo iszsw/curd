@@ -1,6 +1,6 @@
 <?php
 /**
- * Author: zsw zswemail@qq.com
+ * Author: zsw iszsw@qq.com
  */
 
 namespace iszsw\curd\controller;
@@ -13,31 +13,24 @@ use iszsw\curd\lib\ResolveField;
  * 自动生成页面
  *
  * @package iszsw\curd\controller
- * Author: zsw zswemail@qq.com
+ * Author: zsw iszsw@qq.com
  */
 class Page extends Common
 {
 
-    private $table;
-
-    public function __construct()
+    public function index(string $_table)
     {
-        $this->table = request()->param('_table');
+        return $this->createTable(new page\Table($_table));
     }
 
-    public function index()
+    public function update(string $_table)
     {
-        return $this->createTable(new page\Table($this->table));
+        return $this->createForm(new page\Form($_table));
     }
 
-    public function update()
+    public function change(string $_table, $field, $value)
     {
-        return $this->createForm(new page\Form($this->table));
-    }
-
-    public function change($field, $value)
-    {
-        $model = (new ResolveField($this->table));
+        $model = (new ResolveField($_table));
         $pkKey = $model->pk;
         $pk = input($pkKey);
 
@@ -53,9 +46,9 @@ class Page extends Common
         return Helper::error($model->getError());
     }
 
-    public function delete()
+    public function delete(string $_table)
     {
-        $model = (new ResolveField($this->table));
+        $model = (new ResolveField($_table));
         $pkKey = $model->pk;
         $data = (array)input($pkKey);
 
