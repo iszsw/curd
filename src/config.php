@@ -12,6 +12,7 @@ return [
             'save_path' => runtime_path('curd'),
         ]
     ],
+    'middleware' => '', // array|string 设置路由的中间件
 
     /*
      * surface配置 配置优先级: 自定义配置 > 默认配置
@@ -25,7 +26,7 @@ return [
      */
     'surface' => [
         // 静态资源CDN地址
-        'cdn'   => '',
+//        'cdn'   => '',
         'table' => [
             'style' => [ // 公共资源
             ],

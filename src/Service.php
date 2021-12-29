@@ -24,7 +24,7 @@ class Service extends \think\Service
     {
         $this->registerRoutes(function (){
             $route_prefix = config('curd.route_prefix', '');
-            Route::group($route_prefix, function () {
+            $route = Route::group($route_prefix, function () {
                 $table_namespace = '\iszsw\curd\controller\Table@';
                 Route::rule('/'     , $table_namespace . 'index');
                 Route::rule('update/:table'  , $table_namespace . 'update');
@@ -52,6 +52,11 @@ class Service extends \think\Service
                 });
 
             });
+
+            if ($middleware = config('curd.middleware', null)){
+                $route->middleware($middleware);
+            }
+
         });
 
     }
