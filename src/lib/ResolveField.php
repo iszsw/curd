@@ -219,7 +219,7 @@ class ResolveField extends Resolve
                 case 'switcher':
                 case 'upload':
                 case 'take':
-                    $default = json_decode($default, true) ?? $default;
+                    $default = is_array($default) ? $default : json_decode($default, true) ?? $default;
                     break;
                 default:
             }
