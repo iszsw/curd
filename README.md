@@ -67,12 +67,12 @@ $ composer require iszsw/curd
 
 - 表管理
 
-[![cZxRxA.png](https://s4.ax1x.com/2021/12/28/TsTk0e.png)](https://s4.ax1x.com/2021/12/28/TsTk0e.png)
+![cZxRxA.png](https://s4.ax1x.com/2021/12/28/TsTk0e.png)
 
 
 - 自动生成生成页面
 
-[![T6OAAK.png](https://s4.ax1x.com/2021/12/29/T6OAAK.png)](https://imgtu.com/i/T6OAAK)
-[![T6OEtO.png](https://s4.ax1x.com/2021/12/29/T6OEtO.png)](https://imgtu.com/i/T6OEtO)
-[![T6Oqvd.png](https://s4.ax1x.com/2021/12/29/T6Oqvd.png)](https://imgtu.com/i/T6Oqvd)
-[![cZx22d.png](https://z3.ax1x.com/2021/07/03/RRmljI.png)](https://z3.ax1x.com/2021/07/03/RRmljI.png)
+![T6OAAK.png](https://s4.ax1x.com/2021/12/29/T6OAAK.png)
+![T6OEtO.png](https://s4.ax1x.com/2021/12/29/T6OEtO.png)
+![T6Oqvd.png](https://s4.ax1x.com/2021/12/29/T6Oqvd.png)
+![cZx22d.png](https://z3.ax1x.com/2021/07/03/RRmljI.png)
