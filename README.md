@@ -40,7 +40,7 @@ github地址：[https://github.com/iszsw/curd](https://github.com/iszsw/curd)
 
 ## 安装和使用
 
-> 运行环境要求PHP7.1+。
+> 运行环境要求 PHP7.1+ || PHP8.0+
 
 ```shell
 $ composer require iszsw/curd
