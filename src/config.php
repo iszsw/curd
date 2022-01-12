@@ -25,8 +25,8 @@ return [
      * Table.globals.props 参数 https://element.eleme.cn/#/zh-CN/component/table#table-attributes
      */
     'surface' => [
-        // 静态资源CDN地址
-//        'cdn'   => '',
+        // 静态资源CDN地址 默认使用公共cdn 如果需要自定义cdn地址 请下载静态资源 https://gitee.com/iszsw/surface-src
+        'cdn'   => '',
         'table' => [
             'style' => [ // 公共资源
             ],
