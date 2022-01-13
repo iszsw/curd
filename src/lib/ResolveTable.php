@@ -333,9 +333,20 @@ class ResolveTable extends Resolve
 
     public function getHeader(): ?Component
     {
-        $buttons = $this->getButtons(TableModel::LOCAL_TOP);
+        $children = $titleChildren = [];
+        if ($this->table['title']) {
+            $titleChildren[] = (new Component())->el('span')->class('title')->children([$this->table['title']]);
+        }
+        if ($this->table['description']) {
+            $titleChildren[] = (new Component())->el('span')->class('describe')->children([$this->table['description']]);
+        }
+        if (count($titleChildren)) {
+            $children[] = (new Component())->el('p')->children($titleChildren);
+        }
 
-        return count($buttons) < 1 ? null : (new Component())->children($buttons);
+        $children = array_merge($children, $this->getButtons(TableModel::LOCAL_TOP));
+
+        return count($children) ? (new Component(['el' => 'div']))->children($children) : null;
     }
 
     public function getOptions(): array
