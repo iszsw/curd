@@ -36,8 +36,8 @@ class Form extends FormAbstract
         }
         $buttons = [];
         foreach ($model['button'] as $b) {
-            $b['data_extend'] = Helper::formatOptions($b['data_extend'], TableModel::VALUE, TableModel::KEY);
-            $b['btn_extend'] = Helper::formatOptions($b['btn_extend'], TableModel::VALUE, TableModel::KEY);
+            $b['data_extend'] = Helper::formatOptions($b['data_extend'] ?? [], TableModel::VALUE, TableModel::KEY);
+            $b['btn_extend'] = Helper::formatOptions($b['btn_extend'] ?? [], TableModel::VALUE, TableModel::KEY);
             $buttons[] = $b;
         }
         $fields = array_keys($model['fields']);
@@ -68,26 +68,44 @@ class Form extends FormAbstract
                         (new Input('icon', TableModel::$labels["icon"]))->marker("<a target='_blank' href='https://element.eleme.cn/#/zh-CN/component/icon'>图标地址</a>"),
                         (new Input('title', TableModel::$labels["title"])),
                         (new Radio('button_local', TableModel::$labels["button_local"], $model['option_local'] ?? TableModel::LOCAL_TOP))
-                            ->options(Helper::formatOptions(TableModel::$localLabels)),
-                        (new Select('top_type', TableModel::$labels["button_type"], TableModel::BTN_TYPE_PAGE))
-                            ->options(Helper::formatOptions(TableModel::$btnTypeLabels))
-                            ->visible([['prop' => 'button_local', 'value' => TableModel::LOCAL_TOP]]),
-                        (new Select('right_type', TableModel::$labels["button_type"], TableModel::BTN_TYPE_PAGE))->options(
-                            Helper::formatOptions([
-                                                      TableModel::BTN_TYPE_PAGE    => TableModel::$btnTypeLabels[TableModel::BTN_TYPE_PAGE],
-                                                      TableModel::BTN_TYPE_CONFIRM => TableModel::$btnTypeLabels[TableModel::BTN_TYPE_CONFIRM],
-                                                  ])
-                        )->visible([['prop' => 'button_local', 'value' => TableModel::LOCAL_RIGHT]]),
+                            ->options(Helper::formatOptions(TableModel::$localLabels))
+                            ->marker(TableModel::$localLabels[TableModel::LOCAL_TOP] . '：显示在表格header中<br>' . TableModel::$localLabels[TableModel::LOCAL_RIGHT] . '：显示在表格列中<br>'),
+
+                        (new Select('top_event', TableModel::$labels["button_event"], TableModel::BTN_EVENT_PAGE))
+                            ->options(Helper::formatOptions(TableModel::$btnEventLabels))
+                            ->props(['allow-create' => true, 'filterable' => true, 'default-first-option' => true])
+                            ->visible([['prop' => 'button_local', 'value' => TableModel::LOCAL_TOP]])
+                            ->marker('按钮点击事件，可自定义点击事件，通过Vue.mixin注册'),
+                        (new Select('right_event', TableModel::$labels["button_event"], TableModel::BTN_EVENT_PAGE))->options(
+                            Helper::formatOptions(
+                                [
+                                    TableModel::BTN_EVENT_PAGE    => TableModel::$btnEventLabels[TableModel::BTN_EVENT_PAGE],
+                                    TableModel::BTN_EVENT_CONFIRM => TableModel::$btnEventLabels[TableModel::BTN_EVENT_CONFIRM],
+                                ]
+                            )
+                        )
+                            ->props(['allow-create' => true, 'filterable' => true, 'default-first-option' => true])
+                            ->visible([['prop' => 'button_local', 'value' => TableModel::LOCAL_RIGHT]])
+                            ->marker('按钮点击事件，可自定义点击事件，通过全局mixin注册'),
 
                         (new Input('confirm_msg', TableModel::$labels["confirm_msg"]))->marker('按钮点击提示文字')->visible(
                             [
-                                ['exec' => "(model.button_local === '".TableModel::LOCAL_TOP."' && model.top_type === '".TableModel::BTN_TYPE_CONFIRM."') || (model.button_local === '".TableModel::LOCAL_RIGHT."' && model.right_type === '".TableModel::BTN_TYPE_CONFIRM."')"],
+                                ['exec' => "(model.button_local === '".TableModel::LOCAL_TOP."' && model.top_event === '".TableModel::BTN_EVENT_CONFIRM."') || (model.button_local === '".TableModel::LOCAL_RIGHT."' && model.right_event === '".TableModel::BTN_EVENT_CONFIRM."')"],
                             ]
                         ),
 
                         (new Input('url', TableModel::$labels["url"]))
-                            ->visible([['exec' => 'model.button_local !== "'.TableModel::LOCAL_TOP.'" || (model.top_type !== "'.TableModel::BTN_TYPE_REFRESH.'" && model.top_type !== "'.TableModel::BTN_TYPE_CUSTOM.'")']])
+                            ->visible([
+                                [
+                                    'exec' => 'model.top_event == "'.TableModel::BTN_EVENT_PAGE.'"' .
+                                        ' || model.top_event == "'.TableModel::BTN_EVENT_SUBMIT.'"'.
+                                        ' || model.top_event == "'.TableModel::BTN_EVENT_CONFIRM.'"'.
+                                        ' || model.right_event == "'.TableModel::BTN_EVENT_PAGE.'"'.
+                                        ' || model.right_event == "'.TableModel::BTN_EVENT_CONFIRM.'"'
+                                ]
+                                      ])
                         ->marker("列按钮的地址支持变量替换（例如 【/edit/{id}?name={name}】根据当前列数据自动替换变量 'id'和'name'）"),
+
                         (new Arrays('data_extend', TableModel::$labels['data_extend'], []))->options(
                             [
                                 (new Input(TableModel::KEY, TableModel::$labels[TableModel::KEY]))->item(false),
@@ -99,8 +117,8 @@ class Form extends FormAbstract
                                 (new Input(TableModel::KEY, TableModel::$labels[TableModel::KEY]))->item(false),
                                 (new Input(TableModel::VALUE, TableModel::$labels[TableModel::VALUE]))->item(false),
                             ]
-                        )->marker('按钮样式扩展(el-button的 props) type=>primary, class => export'),
-                    ]
+                        )->marker('按钮样式扩展(el-button的 props): type=>primary, class => export'),
+                        ]
                 )->marker("自定义的操作按钮"),
 
             (new Arrays('extend', TableModel::$labels['extend'], Helper::formatOptions($model['extend'], TableModel::VALUE, TableModel::KEY)))->options(

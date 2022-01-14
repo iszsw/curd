@@ -194,7 +194,7 @@ class ResolveTable extends Resolve
                                    "icon"         => "el-icon-search",
                                    "title"        => TableModel::$labels['search'],
                                    "button_local" => TableModel::LOCAL_TOP,
-                                   "top_type"     => TableModel::BTN_TYPE_SEARCH,
+                                   "top_event"     => TableModel::BTN_EVENT_SEARCH,
                                ]
                     );
                     break;
@@ -216,7 +216,7 @@ class ResolveTable extends Resolve
                                    "icon"         => "el-icon-plus",
                                    "title"        => TableModel::$buttonDefaultLabels[TableModel::BUTTON_CREATE],
                                    "button_local" => TableModel::LOCAL_TOP,
-                                   "top_type"     => TableModel::BTN_TYPE_PAGE,
+                                   "top_event"     => TableModel::BTN_EVENT_PAGE,
                                    "url"          => Helper::builder_table_url('page/create/'.$this->table['table']),
                                ]
                     );
@@ -228,7 +228,7 @@ class ResolveTable extends Resolve
                                    "icon"         => "el-icon-edit-outline",
                                    "title"        => TableModel::$buttonDefaultLabels[TableModel::BUTTON_UPDATE],
                                    "button_local" => TableModel::LOCAL_RIGHT,
-                                   "right_type"   => TableModel::BTN_TYPE_PAGE,
+                                   "right_event"   => TableModel::BTN_EVENT_PAGE,
                                    "data_extend"  => [$this->table['pk'],],
                                    "url"          => Helper::builder_table_url('page/update/'.$this->table['table']),
                                ]
@@ -241,7 +241,7 @@ class ResolveTable extends Resolve
                                    "icon"         => "el-icon-close",
                                    "title"        => TableModel::$buttonDefaultLabels[TableModel::BUTTON_DELETE],
                                    "button_local" => TableModel::LOCAL_TOP,
-                                   "top_type"     => TableModel::BTN_TYPE_SUBMIT,
+                                   "top_event"     => TableModel::BTN_EVENT_SUBMIT,
                                    "confirm_msg"  => "确认删除？",
                                    "url"          => Helper::builder_table_url('page/delete/'.$this->table['table']),
                                ]
@@ -252,7 +252,7 @@ class ResolveTable extends Resolve
                                    "icon"         => "el-icon-close",
                                    "title"        => TableModel::$buttonDefaultLabels[TableModel::BUTTON_DELETE],
                                    "button_local" => TableModel::LOCAL_RIGHT,
-                                   "right_type"   => TableModel::BTN_TYPE_CONFIRM,
+                                   "right_event"   => TableModel::BTN_EVENT_CONFIRM,
                                    "confirm_msg"  => "确认删除？",
                                    "data_extend"  => [$this->table['pk']],
                                    "url"          => Helper::builder_table_url('page/delete/'.$this->table['table']),
@@ -265,7 +265,7 @@ class ResolveTable extends Resolve
                                    "icon"         => "el-icon-refresh",
                                    "title"        => TableModel::$buttonDefaultLabels[TableModel::BUTTON_REFRESH],
                                    "button_local" => TableModel::LOCAL_TOP,
-                                   "top_type"     => TableModel::BTN_TYPE_REFRESH,
+                                   "top_event"     => TableModel::BTN_EVENT_REFRESH,
                                ]
                     );
                     break;
@@ -287,7 +287,7 @@ class ResolveTable extends Resolve
                 "icon"         => "el-icon-setting",
                 "title"        => 'title',
                 "button_local" => "right",
-                "right_type"   => "page",
+                "right_event"   => "page",
                 "url"          => '',
                 "data_extend"  => [],
                 "btn_extend"   => [],
@@ -295,22 +295,22 @@ class ResolveTable extends Resolve
         );
 
         $btn = $this->surfaceTable->button($param['icon'], $param['title']);
-        $type = $param[$param['button_local'].'_type'];
+        $type = $param[$param['button_local'].'_event'];
         switch ($type)
         {
-            case TableModel::BTN_TYPE_PAGE:
+            case TableModel::BTN_EVENT_PAGE:
                 $btn->createPage($param['url'], $param['data_extend'])->props('doneRefresh', true);
                 break;
-            case TableModel::BTN_TYPE_CONFIRM:
+            case TableModel::BTN_EVENT_CONFIRM:
                 $btn->createConfirm($param['confirm_msg'] ?? '', ['method' => 'post', 'data' => $param['data_extend'], 'url' => $param['url']]);
                 break;
-            case TableModel::BTN_TYPE_REFRESH:
+            case TableModel::BTN_EVENT_REFRESH:
                 $btn->createRefresh();
                 break;
-            case TableModel::BTN_TYPE_SEARCH:
+            case TableModel::BTN_EVENT_SEARCH:
                 $btn->createSearch();
                 break;
-            case TableModel::BTN_TYPE_SUBMIT:
+            case TableModel::BTN_EVENT_SUBMIT:
                 $btn->createSubmit(
                     [
                         'method' => 'post',
@@ -319,8 +319,8 @@ class ResolveTable extends Resolve
                     ], $param['confirm_msg'] ?? '', $this->table['pk']
                 );
                 break;
-            case TableModel::BTN_TYPE_CUSTOM:
-                break;
+            default:
+                $btn->props('handler', $type);
         }
 
         if (count($param['btn_extend']) > 0)

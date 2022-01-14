@@ -49,7 +49,7 @@ class Table
             'table_type'    => '表格类型',
             'button_local'  => '按钮位置',
             'button_default'=> '默认按钮',
-            'button_type'   => '按钮类型',
+            'button_event'   => '按钮事件',
             'icon'          => '图标',
             'marker'        => '提示文本',
             'url'           => '地址',
@@ -121,24 +121,22 @@ class Table
 
     public static $localLabels
         = [
-            self::LOCAL_TOP   => '顶部按钮',
+            self::LOCAL_TOP   => '头按钮',
             self::LOCAL_RIGHT => '列按钮',
         ];
 
-    const BTN_TYPE_PAGE = 'page';
-    const BTN_TYPE_SEARCH = 'search';
-    const BTN_TYPE_SUBMIT = 'submit';
-    const BTN_TYPE_CONFIRM = 'confirm';
-    const BTN_TYPE_REFRESH = 'refresh';
-    const BTN_TYPE_CUSTOM = 'custom';
+    const BTN_EVENT_PAGE = 'page';
+    const BTN_EVENT_SEARCH = 'search';
+    const BTN_EVENT_SUBMIT = 'submit';
+    const BTN_EVENT_CONFIRM = 'confirm';
+    const BTN_EVENT_REFRESH = 'refresh';
 
-    public static $btnTypeLabels
+    public static $btnEventLabels
         = [
-            self::BTN_TYPE_PAGE    => '页面',
-            self::BTN_TYPE_SUBMIT  => '提交',
-            self::BTN_TYPE_CONFIRM => '确认',
-            self::BTN_TYPE_REFRESH => '刷新',
-            self::BTN_TYPE_CUSTOM  => '自定义',
+            self::BTN_EVENT_PAGE    => '页面 page',
+            self::BTN_EVENT_SUBMIT  => '提交 submit',
+            self::BTN_EVENT_CONFIRM => '确认 confirm',
+            self::BTN_EVENT_REFRESH => '刷新 refresh',
         ];
 
     public static $formatTypes
