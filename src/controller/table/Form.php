@@ -95,15 +95,19 @@ class Form extends FormAbstract
                         ),
 
                         (new Input('url', TableModel::$labels["url"]))
-                            ->visible([
+                            ->visible(
                                 [
-                                    'exec' => 'model.top_event == "'.TableModel::BTN_EVENT_PAGE.'"' .
-                                        ' || model.top_event == "'.TableModel::BTN_EVENT_SUBMIT.'"'.
-                                        ' || model.top_event == "'.TableModel::BTN_EVENT_CONFIRM.'"'.
-                                        ' || model.right_event == "'.TableModel::BTN_EVENT_PAGE.'"'.
-                                        ' || model.right_event == "'.TableModel::BTN_EVENT_CONFIRM.'"'
-                                ]
-                                      ])
+                                      [
+                                          'exec' => '(model.button_local === "'.TableModel::LOCAL_TOP.'"'.
+                                              ' && (model.top_event == "'.TableModel::BTN_EVENT_PAGE.'"' .
+                                              ' || model.top_event == "'.TableModel::BTN_EVENT_SUBMIT.'"'.
+                                              ' || model.top_event == "'.TableModel::BTN_EVENT_CONFIRM.'"))'.
+                                              ' || (model.button_local === "'.TableModel::LOCAL_RIGHT.'"'.
+                                              ' && (model.right_event == "'.TableModel::BTN_EVENT_PAGE.'"'.
+                                              ' || model.right_event == "'.TableModel::BTN_EVENT_CONFIRM.'"))'
+                                      ]
+                                  ]
+                            )
                         ->marker("列按钮的地址支持变量替换（例如 【/edit/{id}?name={name}】根据当前列数据自动替换变量 'id'和'name'）"),
 
                         (new Arrays('data_extend', TableModel::$labels['data_extend'], []))->options(
