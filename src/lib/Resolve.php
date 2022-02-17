@@ -111,7 +111,8 @@ abstract class Resolve
                         $method = $func[1];
                         $val = $func[0]::$method($val, $row, ...$params);
                     }elseif ($method->isPublic()) {
-                        $val = (new $func[0]())->$func[1]($val, $row, ...$params);
+                        $method = $func[1];
+                        $val = (new $func[0]())->$method($val, $row, ...$params);
                     }
                 }else{
                     throw new CurdException('method not exists: ' . $func[1]);
