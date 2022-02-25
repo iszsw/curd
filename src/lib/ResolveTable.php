@@ -9,6 +9,8 @@ namespace iszsw\curd\lib;
 use iszsw\curd\Helper;
 use surface\Component;
 use surface\Factory;
+use surface\helper\Read;
+use surface\helper\TableAbstract;
 use surface\table\components\Button;
 use surface\table\components\Column;
 use surface\table\components\Selection;
@@ -63,8 +65,10 @@ class ResolveTable extends Resolve
 
     protected $hasSearch;
 
-    public function hasSearch($force = false):bool {
-        if ($force || null === $this->hasSearch) {
+    public function hasSearch($force = false): bool
+    {
+        if ($force || null === $this->hasSearch)
+        {
             // columns
             foreach ($this->table['fields'] as $k => $f)
             {
@@ -75,6 +79,7 @@ class ResolveTable extends Resolve
                 }
             }
         }
+
         return $this->hasSearch;
     }
 
@@ -146,7 +151,7 @@ class ResolveTable extends Resolve
                 $child = $this->surfaceTable->$type()->props(
                     [
                         'options'     => $options,
-                        'async'       => [
+                        'async'   => [
                             'method' => 'post',
                             'data'   => ['id'],
                             'url'    => Helper::builder_table_url('page/change/'.$this->table['table']),
@@ -192,9 +197,9 @@ class ResolveTable extends Resolve
                     array_unshift(
                         $button, [
                                    "icon"         => "el-icon-search",
-                                   "title"        => TableModel::$labels['search'],
+                                   "title" => TableModel::$labels['search'],
                                    "button_local" => TableModel::LOCAL_TOP,
-                                   "top_event"     => TableModel::BTN_EVENT_SEARCH,
+                                   "top_event"    => TableModel::BTN_EVENT_SEARCH,
                                ]
                     );
                     break;
@@ -213,10 +218,10 @@ class ResolveTable extends Resolve
                     array_unshift(
                         $button, [
                                    "doneRefresh"  => true,
-                                   "icon"         => "el-icon-plus",
-                                   "title"        => TableModel::$buttonDefaultLabels[TableModel::BUTTON_CREATE],
+                                   "icon"        => "el-icon-plus",
+                                   "title"       => TableModel::$buttonDefaultLabels[TableModel::BUTTON_CREATE],
                                    "button_local" => TableModel::LOCAL_TOP,
-                                   "top_event"     => TableModel::BTN_EVENT_PAGE,
+                                   "top_event"    => TableModel::BTN_EVENT_PAGE,
                                    "url"          => Helper::builder_table_url('page/create/'.$this->table['table']),
                                ]
                     );
@@ -225,10 +230,10 @@ class ResolveTable extends Resolve
                     array_unshift(
                         $button, [
                                    "doneRefresh"  => true,
-                                   "icon"         => "el-icon-edit-outline",
-                                   "title"        => TableModel::$buttonDefaultLabels[TableModel::BUTTON_UPDATE],
+                                   "icon"        => "el-icon-edit-outline",
+                                   "title"       => TableModel::$buttonDefaultLabels[TableModel::BUTTON_UPDATE],
                                    "button_local" => TableModel::LOCAL_RIGHT,
-                                   "right_event"   => TableModel::BTN_EVENT_PAGE,
+                                   "right_event"  => TableModel::BTN_EVENT_PAGE,
                                    "data_extend"  => [$this->table['pk'],],
                                    "url"          => Helper::builder_table_url('page/update/'.$this->table['table']),
                                ]
@@ -238,10 +243,10 @@ class ResolveTable extends Resolve
                     array_unshift(
                         $button, [
                                    "doneRefresh"  => true,
-                                   "icon"         => "el-icon-close",
-                                   "title"        => TableModel::$buttonDefaultLabels[TableModel::BUTTON_DELETE],
+                                   "icon"        => "el-icon-close",
+                                   "title"       => TableModel::$buttonDefaultLabels[TableModel::BUTTON_DELETE],
                                    "button_local" => TableModel::LOCAL_TOP,
-                                   "top_event"     => TableModel::BTN_EVENT_SUBMIT,
+                                   "top_event"    => TableModel::BTN_EVENT_SUBMIT,
                                    "confirm_msg"  => "确认删除？",
                                    "url"          => Helper::builder_table_url('page/delete/'.$this->table['table']),
                                ]
@@ -249,10 +254,10 @@ class ResolveTable extends Resolve
                     array_unshift(
                         $button, [
                                    "doneRefresh"  => true,
-                                   "icon"         => "el-icon-close",
-                                   "title"        => TableModel::$buttonDefaultLabels[TableModel::BUTTON_DELETE],
+                                   "icon"        => "el-icon-close",
+                                   "title"       => TableModel::$buttonDefaultLabels[TableModel::BUTTON_DELETE],
                                    "button_local" => TableModel::LOCAL_RIGHT,
-                                   "right_event"   => TableModel::BTN_EVENT_CONFIRM,
+                                   "right_event"  => TableModel::BTN_EVENT_CONFIRM,
                                    "confirm_msg"  => "确认删除？",
                                    "data_extend"  => [$this->table['pk']],
                                    "url"          => Helper::builder_table_url('page/delete/'.$this->table['table']),
@@ -263,9 +268,9 @@ class ResolveTable extends Resolve
                     array_unshift(
                         $button, [
                                    "icon"         => "el-icon-refresh",
-                                   "title"        => TableModel::$buttonDefaultLabels[TableModel::BUTTON_REFRESH],
+                                   "title" => TableModel::$buttonDefaultLabels[TableModel::BUTTON_REFRESH],
                                    "button_local" => TableModel::LOCAL_TOP,
-                                   "top_event"     => TableModel::BTN_EVENT_REFRESH,
+                                   "top_event"    => TableModel::BTN_EVENT_REFRESH,
                                ]
                     );
                     break;
@@ -283,11 +288,11 @@ class ResolveTable extends Resolve
     private function generateButton(array $param): Button
     {
         $param = array_merge(
-            [
+               [
                 "icon"         => "el-icon-setting",
-                "title"        => 'title',
+                "title" => 'title',
                 "button_local" => "right",
-                "right_event"   => "page",
+                "right_event"  => "page",
                 "url"          => '',
                 "data_extend"  => [],
                 "btn_extend"   => [],
@@ -312,7 +317,7 @@ class ResolveTable extends Resolve
                 break;
             case TableModel::BTN_EVENT_SUBMIT:
                 $btn->createSubmit(
-                    [
+                       [
                         'method' => 'post',
                         'data'   => $param['data_extend'],
                         'url'    => $param['url'],
@@ -334,13 +339,16 @@ class ResolveTable extends Resolve
     public function getHeader(): ?Component
     {
         $children = $titleChildren = [];
-        if ($this->table['title']) {
+        if ($this->table['title'])
+        {
             $titleChildren[] = (new Component())->el('span')->class('title')->children([$this->table['title']]);
         }
-        if ($this->table['description']) {
+        if ($this->table['description'])
+        {
             $titleChildren[] = (new Component())->el('span')->class('describe')->children([$this->table['description']]);
         }
-        if (count($titleChildren)) {
+        if (count($titleChildren))
+        {
             $children[] = (new Component())->el('p')->children($titleChildren);
         }
 
@@ -349,32 +357,35 @@ class ResolveTable extends Resolve
         return count($children) ? (new Component(['el' => 'div']))->children($children) : null;
     }
 
-    public function getOptions(): array
+    public function getOptions(?TableAbstract $table = null): array
     {
         if (is_null($this->options))
         {
             $this->options = $this->table['extend'] ?? [];
-            $this->options = isset($this->options['props']) ? $this->options : ['props' => count($this->options) > 0 ? $this->options : (object)[]];
+            $this->options = isset($this->options['props'])
+                ? $this->options
+                : [
+                    'props' => count($this->options) > 0 ? $this->options : new \stdClass(),
+                ];
+        }
+
+        if ( ! ($this->table['page'] ?? true) && $table)
+        {
+            $this->options['props'] = json_decode(json_encode($this->options['props'], JSON_UNESCAPED_UNICODE), true);
+            $condition = Read::initSearchConditions($table);
+            $this->options['props']['data'] = $this->getData($condition['where'], '', null)['list'];
         }
 
         return $this->options;
     }
 
-    public function getPagination(): Component
+    public function getPagination($def = null): ?Component
     {
-        return (new Component())->props(
-            [
-                'async' => [
-                    'url' => Helper::builder_table_url('page/'.$this->table['table']),
-                ],
-            ]
-        );
+        return $this->table['page'] ?? false ? $def : null;
     }
 
-    public function getData($where = [], $order = '', $page = 1, $limit = 15): array
+    public function getData($where = [], $order = '', $page = null, $limit = 15): array
     {
-        $model = Model::instance()->name($this->table['table'])->where($where);
-        $count = $model->count();
         $fields = [];
         $relation = [];
         $remote_relation = [];
@@ -399,12 +410,25 @@ class ResolveTable extends Resolve
             }
         }
 
+        $where = array_filter($where, function ($w)
+        {
+            return isset($this->table['fields'][$w[0]]) && $this->table['fields'][$w[0]]['search_type'] !== "_";
+        });
+
+        $model = Model::instance()->name($this->table['table'])->where($where);
+        $count = $model->count();
+
         if (false === array_search($this->table['pk'], $fields))
         {
             $fields[] = $this->table['pk'];
         }
 
-        $lists = $model->field($fields)->order($order ?: $this->table['pk'].' DESC')->page($page, $limit)->select()->toArray();
+        $lists = $model->field($fields)->order($order ?: $this->table['pk'].' DESC');
+        if ($page !== null)
+        {
+            $lists = $lists->page($page, $limit);
+        }
+        $lists = $lists->select()->toArray();
         $lists = array_combine(array_column($lists, $this->table['pk']), $lists);
 
         $relationData = [];
@@ -443,7 +467,7 @@ class ResolveTable extends Resolve
         }
         unset($remote_relation);
 
-        foreach ($lists as $k => &$list)
+        foreach ($lists as &$list)
         {
             foreach ($this->table['fields'] as $field => $config)
             {
@@ -487,10 +511,8 @@ class ResolveTable extends Resolve
                 {
                     $value = $this->invoke($config["table_format"], $value, $list);
                 }
-
-                $list[$field] = $this->toString($value);
+                $list[$field] = $this->format($value);
             }
-
         }
         unset($list);
 
@@ -500,12 +522,20 @@ class ResolveTable extends Resolve
         ];
     }
 
-    private function toString($data)
+    private function format($val)
     {
-        return is_array($data) ? json_encode($data, JSON_UNESCAPED_UNICODE) : (string)$data;
+        if (is_array($val))
+        {
+            return json_encode($val, JSON_UNESCAPED_UNICODE);
+        } elseif (is_numeric($val))
+        {
+            return $val;
+        }
+
+        return (string)$val;
     }
 
-    private function joinName($table, $title)
+    private function joinName($table, $title): string
     {
         return "{$table}__{$title}";
     }

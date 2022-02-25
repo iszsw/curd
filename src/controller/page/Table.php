@@ -39,7 +39,7 @@ class Table extends TableAbstract
 
     public function options(): array
     {
-        return $this->table->getOptions();
+        return $this->table->getOptions($this);
     }
 
     public function columns(): array
@@ -49,14 +49,11 @@ class Table extends TableAbstract
 
     public function pagination(): ?Component
     {
-        return $this->table->getPagination();
+        return $this->table->getPagination(parent::pagination());
     }
 
     public function data($where = [], $order = '', $page = 1, $limit = 15): array
     {
-        $where = array_filter($where, function ($w) {
-            return !in_array($w[0], ['_table']);
-        });
         return $this->table->getData(array_values($where), $order, $page, $limit);
     }
 

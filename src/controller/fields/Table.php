@@ -41,26 +41,6 @@ class Table extends TableAbstract
         );
     }
 
-    public function options(): array
-    {
-        $list = Manage::instance()->fields($this->table);
-        $formTypes = TableModel::getFormServersLabels();
-        foreach ($list as &$v)
-        {
-            $v['name'] = $v['field'];
-            (isset($v['field_label']) && $v['field_label'])
-            || $v['field_label'] = $v['field'].((isset($v['key']) && $v['key']) ? "【{$v['key']}】" : '').($v['relation'] ? '【增】' : '');
-            $v['search'] = $formTypes[$v['search_type']].($v['search_type'] !== '_' ? "  【{$v['search']}】 " : '');
-        }
-        unset($v);
-
-        return [
-            'props' => [
-                'data' => $list,
-            ],
-        ];
-    }
-
     public function columns(): array
     {
         $formTypes = TableModel::getFormServersLabels();
@@ -133,16 +113,24 @@ class Table extends TableAbstract
                     ]
                 ),
         ];
-
-    }
-
-    public function pagination(): ?Component
-    {
-        return null;
     }
 
     public function data($where = [], $order = '', $page = 1, $limit = 15): array
     {
-        return [];
+        $list = Manage::instance()->fields($this->table);
+        $formTypes = TableModel::getFormServersLabels();
+        foreach ($list as &$v)
+        {
+            $v['name'] = $v['field'];
+            (isset($v['field_label']) && $v['field_label'])
+            || $v['field_label'] = $v['field'].((isset($v['key']) && $v['key']) ? "【{$v['key']}】" : '').($v['relation'] ? '【增】' : '');
+            $v['search'] = $formTypes[$v['search_type']].($v['search_type'] !== '_' ? "  【{$v['search']}】 " : '');
+        }
+        unset($v);
+
+        return [
+            'count' => count($list),
+            'list' => $list
+        ];
     }
 }

@@ -291,7 +291,7 @@ class ResolveField extends Resolve
                     $relation[$k] = $v;
                 } elseif (in_array($k, $fields))
                 {
-                    $post[$k] = $v = $this->invoke($field['save_format'], $v, $post);
+                    $post[$k] = $v = $this->invoke($field['save_format'], $post[$k], $post);
                     if ($v !== null)
                     {
                         if (is_array($v))

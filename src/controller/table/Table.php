@@ -22,6 +22,20 @@ class Table extends TableAbstract
         $this->status = input('status/b', true);
     }
 
+    public function init(\surface\table\Table $table)
+    {
+        $table->addStyle(<<<STYLE
+<style>
+.el-menu--horizontal>.el-menu-item{
+    padding: 0px;
+}
+.el-menu--horizontal>.el-menu-item>a{
+    padding: 0px 20px;
+}
+</style>
+STYLE);
+    }
+
     public function options(): array
     {
         $manage = Manage::instance();
@@ -47,8 +61,6 @@ class Table extends TableAbstract
     public function header(): ?Component
     {
         $url = Helper::builder_table_url('page', [], true);
-        $prefix = Manage::getPrefix();
-
         return (new Component(['el' => 'div']))->children(
             [
                 (new Component())->el('p')->children(
@@ -124,12 +136,17 @@ class Table extends TableAbstract
             (new Column('options', '操作'))->props('fixed', 'right')->props('width', '120px')
                 ->scopedSlots(
                     [
-                        (new Button('el-icon-edit-outline', '表配置'))->createPage($fieldsUrl.'/{table}'),
+                        (new Button('el-icon-edit-outline', '表配置'))->createPage($fieldsUrl.'/{table}')->props('doneRefresh',true),
                         (new Button('el-icon-tickets', '字段信息'))->createPage($dataUrl.'/{table}'),
                         (new Button('el-icon-refresh', '初始化表'))
                             ->createConfirm('当前表所有配置将被初始化，确认操作？', ['method' => 'post', 'url' => $delUrl.'/{table}']),
                     ]
                 ),
         ];
+    }
+
+    public function pagination(): ?Component
+    {
+        return null;
     }
 }
