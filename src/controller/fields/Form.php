@@ -226,8 +226,7 @@ class Form extends FormAbstract
             );
         }
 
-        array_push(
-            $column, (new Column('', TableModel::$labels['custom']))->el('el-tabs')
+        $column[] = (new Column('', TableModel::$labels['custom']))->el('el-tabs')
             ->children(
                 [
                     (new Component())->el('el-tab-pane')->item(false)
@@ -243,8 +242,7 @@ class Form extends FormAbstract
                         ->props('label', TableModel::$labels["save"])
                         ->children($saveChildren),
                 ]
-            )
-        );
+            );
 
         return $column;
     }

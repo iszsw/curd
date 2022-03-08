@@ -365,13 +365,12 @@ class ResolveTable extends Resolve
             $this->options = isset($this->options['props'])
                 ? $this->options
                 : [
-                    'props' => count($this->options) > 0 ? $this->options : new \stdClass(),
+                    'props' => count($this->options) > 0 ? $this->options : [],
                 ];
         }
 
         if ( ! ($this->table['page'] ?? true) && $table)
         {
-            $this->options['props'] = json_decode(json_encode($this->options['props'], JSON_UNESCAPED_UNICODE), true);
             $condition = Read::initSearchConditions($table);
             $this->options['props']['data'] = $this->getData($condition['where'], '', null)['list'];
         }
