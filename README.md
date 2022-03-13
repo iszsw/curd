@@ -57,11 +57,6 @@ $ composer require iszsw/curd
 
 如果功能不够用可以方便的快速的使用surface生成Table、Form页面
 
-## 介绍
-
-> **邮件** iszsw@qq.com
->
-> **主页**  [https://zsw.ink](https://zsw.ink) 留言
 
 ## 页面
 
