@@ -1,36 +1,25 @@
 {
-    "name": "iszsw/curd",
-    "description": "Mysql数据表生成CURD页面",
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "zsw",
-            "email": "iszsw@qq.com"
-        }
-    ],
-    "homepage": "https://zsw.ink/",
-    "keywords": ["curd", "Low code", "surface", "php"],
-    "support": {
-        "issues": "https://github.com/iszsw/curd/issues",
-        "source": "https://github.com/iszsw/curd"
-    },
-    "require": {
-        "php": ">=7.1.3",
-        "iszsw/surface": "~1.3.0"
-    },
-    "autoload": {
-        "psr-4": {
-            "iszsw\\curd\\": "src"
-        }
-    },
-    "extra": {
-        "think": {
-            "services": [
-                "iszsw\\curd\\Service"
-            ],
-            "config": {
-                "curd": "src/config.php"
-            }
-        }
+  "name": "iszsw/curd",
+  "description": "CURD 页面构建器",
+  "license": "MIT",
+  "keywords": ["curd", "Low code", "surface", "php"],
+  "homepage": "https://zsw.ink/",
+  "authors": [
+    {
+      "name": "zsw",
+      "email": "iszsw@qq.com"
     }
+  ],
+  "support": {
+    "issues": "https://github.com/iszsw/curd/issues",
+    "source": "https://github.com/iszsw/curd"
+  },
+  "require": {
+    "php": ">=8.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "curd\\": "src"
+    }
+  }
 }

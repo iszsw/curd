@@ -1,0 +1,34 @@
+<?php
+declare(strict_types=1);
+
+namespace {NAMESPACE};
+
+{USE}
+
+class {CLASS}
+{
+
+    use \surface\helper\Curd;
+
+    protected function title(): string|Component
+    {
+        return "{TITLE}";
+    }
+
+    protected function searchColumns(): array
+    {
+        return [{SEARCH-COLUMNS}];
+    }
+
+    protected function tableColumns(): array
+    {
+        return [{TABLE-COLUMNS}];
+    }
+
+    protected function formColumns(): array
+    {
+        return [{FORM-COLUMNS}];
+    }
+
+
+}
