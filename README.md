@@ -1,6 +1,6 @@
 <p align="center">
 
-# 基于 [surface](https://gitee.com/iszsw/surface) 的代码生成器.
+# 无任何框架依赖可视化CURD代码生成工具.
 
 </p>
 
@@ -22,7 +22,7 @@ github地址：[https://github.com/iszsw/curd](https://github.com/iszsw/curd)
 composer require iszsw/curd
 ```
 
-## 在线编辑页面
+## 1、在线编辑生成页面
 
 > 控制器中粘贴下面代码
 
@@ -30,20 +30,25 @@ composer require iszsw/curd
 use curd\Config;
 
 $config = new Config();
-// 保存目录，设置之后页面自动填充
-$config->save_path = app()->getRootPath() . "curd"; 
+// 代码保存的绝对路径
+$config->save_path = __DIR__ . "/curd"; 
 // PDO连接，读取数据库的表、字段预载入
-$config->db_pdo = Db::connect()->connect();
+// 如果在框架中可以通过助手获取 (ThinkPHP: Db::connect()->connect())
+$config->db_pdo = new \PDO("mysql:host=localhost;charset=utf8", 'root', 'root'); //
 // 指定表名
 $config->db_database = 'surface';
+
 // 显示页面
-return (new View($config))->fetch();
+$data = (new \curd\View($config))->fetch();
+echo is_array($data) ? json_encode($data) : $data;
 
 ```
+![image962824033a72fdbc.png](https://img.picgo.net/2023/08/05/image962824033a72fdbc.png)
+![image0cd4b57dd58335ab.png](https://img.picgo.net/2023/08/05/image0cd4b57dd58335ab.png)
 
-## 生成页面
+## 2、引入生成的页面代码
 
-> 在线编辑保存之后在相应目录生成curd代码，需要在知道路由控制器引入
+> 在线编辑保存之后会在相应目录生成curd代码，路由控制器引入生成的类就完成了
 
 ```php
 if ($this->request->isAjax()){
@@ -51,12 +56,13 @@ if ($this->request->isAjax()){
     return json_encode([
         "code" => 0,
         "data" => [
-            'data' => [],
-            'total' => [],
+            'data' => [], // 记录列表
+            'total' => 10, // 总记录数
         ],
         'msg' => "success"
     ],JSON_UNESCAPED_UNICODE);
 }
-return (new RecordCurd())->view();
+return (new \app\curd\Admin())->view();
 ```
 
+![image7e7493f861a0f836.png](https://img.picgo.net/2023/08/05/image7e7493f861a0f836.png)
