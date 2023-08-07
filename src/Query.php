@@ -3,13 +3,12 @@
 namespace curd;
 
 use PDO;
-use curd\exceptions\CurdException;
 use surface\components;
 
 class Query
 {
 
-    private PDO $pdo;
+    private ?PDO $pdo;
 
     private string $database;
 
@@ -52,12 +51,8 @@ class Query
 
     public function __construct(Config $config)
     {
-        try {
-            $this->pdo = $config->get('db_pdo');
-            $this->database = $config->get('db_database');
-        } catch (\Throwable $e) {
-            throw new CurdException("config.db_pdo 必须传入 PDO 实例", $e->getCode(), $e);
-        }
+        $this->pdo = $config->get('db_pdo');
+        $this->database = $config->get('db_database');
     }
 
     /**
@@ -67,6 +62,9 @@ class Query
      */
     public function tables(): array
     {
+        if (!$this->pdo) {
+            return [];
+        }
         $sql = "SELECT TABLE_NAME as `table`, TABLE_COMMENT as `comment`, TABLE_ROWS as `rows`,ENGINE as `engine` FROM information_schema.TABLES WHERE TABLE_SCHEMA = :database ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->bindParam(':database', $this->database);
@@ -92,60 +90,31 @@ class Query
                 ]
             );
         }
-        $tablesStr = array_reduce(array_keys($tables), fn($str, $table) => $str . ($str ? "," : '') . "'{$table}'", '');
-        $sql = "SELECT * FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = :database AND TABLE_NAME IN ({$tablesStr})";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->bindParam(':database', $this->database);
-        $stmt->execute();
-        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        foreach ($result as $item) {
-            $isPK = strtolower($item['COLUMN_KEY']) === 'pri';
-            $tables[$item['TABLE_NAME']]['fields'][] = [
-                'sort'    => count($tables[$item['TABLE_NAME']]['fields']) + 1,
-                'name'    => $item['COLUMN_NAME'],
-                'type'    => $item['COLUMN_TYPE'],
-                'notnull' => strtolower($item['IS_NULLABLE']) === 'no',
-                'default' => $item['COLUMN_DEFAULT'],
-                'primary' => $isPK,
-                'autoinc' => strtolower($item['EXTRA']) === 'auto_increment',
-                'comment' => $item['COLUMN_COMMENT'],
-            ];
-            if ($isPK) {
-                $tables[$item['TABLE_NAME']]['pk'] = $item['COLUMN_NAME'];
+        if (count($tables)) {
+            $tablesStr = array_reduce(array_keys($tables), fn($str, $table) => $str . ($str ? "," : '') . "'{$table}'", '');
+            $sql = "SELECT * FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = :database AND TABLE_NAME IN ({$tablesStr})";
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->bindParam(':database', $this->database);
+            $stmt->execute();
+            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            foreach ($result as $item) {
+                $isPK = strtolower($item['COLUMN_KEY']) === 'pri';
+                $tables[$item['TABLE_NAME']]['fields'][] = [
+                    'sort'    => count($tables[$item['TABLE_NAME']]['fields']) + 1,
+                    'name'    => $item['COLUMN_NAME'],
+                    'type'    => $item['COLUMN_TYPE'],
+                    'notnull' => strtolower($item['IS_NULLABLE']) === 'no',
+                    'default' => $item['COLUMN_DEFAULT'],
+                    'primary' => $isPK,
+                    'autoinc' => strtolower($item['EXTRA']) === 'auto_increment',
+                    'comment' => $item['COLUMN_COMMENT'],
+                ];
+                if ($isPK) {
+                    $tables[$item['TABLE_NAME']]['pk'] = $item['COLUMN_NAME'];
+                }
             }
         }
         return array_values($tables);
-    }
-
-
-    /**
-     * 获取字段类型.
-     *
-     * @param string $type 字段类型
-     *
-     * @return string
-     */
-    protected function getFieldType(string $type): string
-    {
-        if (0 === stripos($type, 'set') || 0 === stripos($type, 'enum')) {
-            $result = 'string';
-        } elseif (preg_match('/(double|float|decimal|real|numeric)/is', $type)) {
-            $result = 'float';
-        } elseif (preg_match('/(int|serial|bit)/is', $type)) {
-            $result = 'int';
-        } elseif (preg_match('/bool/is', $type)) {
-            $result = 'bool';
-        } elseif (0 === stripos($type, 'timestamp')) {
-            $result = 'timestamp';
-        } elseif (0 === stripos($type, 'datetime')) {
-            $result = 'datetime';
-        } elseif (0 === stripos($type, 'date')) {
-            $result = 'date';
-        } else {
-            $result = 'string';
-        }
-
-        return $result;
     }
 
 }
